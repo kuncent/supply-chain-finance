@@ -303,6 +303,21 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/cms',
+    component: Layout,
+    redirect: '/sms/custom',
+    name: 'cms',
+    meta: { title: '用户', icon: 'sms' },
+    children: [
+      {
+        path: 'custom',
+        name: 'custom',
+        component: () => import('@/views/cms/custom/custom'),
+        meta: { title: '用户列表', icon: 'ums-role' }
+      },
+    ]
+  },
+  {
     path: '/ums',
     component: Layout,
     redirect: '/ums/admin',

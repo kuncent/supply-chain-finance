@@ -13,21 +13,20 @@
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="父订单号：">
-            <el-input v-model="listQuery.orderSn" class="input-width" placeholder="父订单编号"></el-input>
+          <el-form-item label="用户Id：">
+            <el-input v-model="listQuery.orderSn" class="input-width" placeholder="用户Id"></el-input>
           </el-form-item>
-          <el-form-item label="子订单号：">
-            <el-input v-model="listQuery.subOrderSn" class="input-width" placeholder="子订单编号"></el-input>
+          <el-form-item label="openId：">
+            <el-input v-model="listQuery.subOrderSn" class="input-width" placeholder="openId"></el-input>
           </el-form-item>
-          <el-form-item label="会员名称：">
-            <el-input v-model="listQuery.nicknameSearch" class="input-width" placeholder="会员名称"></el-input>
+          <el-form-item label="昵称：">
+            <el-input v-model="listQuery.nicknameSearch" class="input-width" placeholder="昵称"></el-input>
           </el-form-item>
-          <el-form-item label="收 货 人：">
-            <el-input
-              v-model="listQuery.receiverNameSearch"
-              class="input-width"
-              placeholder="收货人姓名"
-            ></el-input>
+          <el-form-item label="手机号：">
+            <el-input v-model="listQuery.receiverNameSearch" class="input-width" placeholder="手机号"></el-input>
+          </el-form-item>
+          <el-form-item label="父订单：">
+            <el-input v-model="listQuery.nicknameSearch" class="input-width" placeholder="父订单号"></el-input>
           </el-form-item>
           <el-form-item label="创建时间：">
             <el-date-picker
@@ -47,16 +46,6 @@
               placeholder="请选择时间"
             ></el-date-picker>
           </el-form-item>
-          <el-form-item label="订单状态：">
-            <el-select v-model="listQuery.status" class="input-width" placeholder="全部" clearable>
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </el-form-item>
         </el-form>
       </div>
     </el-card>
@@ -74,25 +63,19 @@
         border
       >
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="父订单编号" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
-        </el-table-column>
-        <el-table-column label="子订单编号" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.subOrderSn}}</template>
-        </el-table-column>
         <el-table-column label="提交时间" width="180" align="center">
           <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="用户Id" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
-        <el-table-column label="用户昵称" align="center">
+        <el-table-column label="openId" align="center">
           <template slot-scope="scope">{{scope.row.nickname}}</template>
         </el-table-column>
-        <el-table-column label="商品标题" align="center">
+        <el-table-column label="昵称" align="center">
           <template slot-scope="scope">{{scope.row.productName}}</template>
         </el-table-column>
-        <el-table-column label="商品Id" align="center">
+        <el-table-column label="手机号" align="center">
           <template slot-scope="scope">{{scope.row.productId}}</template>
         </el-table-column>
         <el-table-column label="商品货号" align="center">
@@ -158,12 +141,6 @@
               @click="handleRefund(scope.row.id)"
               v-show="scope.row.status===1 || scope.row.status===2||scope.row.status===3"
             >退款</el-button>
-            <!-- <el-button
-              size="mini"
-              type="danger"
-              @click="handleDeleteOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===4"
-            >删除订单</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -228,7 +205,6 @@
         <el-button type="primary" @click="refundConfim">确 定</el-button>
       </span>
     </el-dialog>
-    <logistics-dialog v-model="logisticsDialogVisible"></logistics-dialog>
   </div>
 </template>
 <script>

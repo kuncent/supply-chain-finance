@@ -72,6 +72,14 @@ export function exportUnshippedOrderItem(params) {
   })
 }
 
+export function importShippingByUrl(params) {
+  return request({
+    url: '/orderItem/importShippingByUrl',
+    method: 'post',
+    params: params
+  })
+}
+
 export function fetchHistoryList(params) {
   return request({
     url: '/orderItem/listExportUnshippedOrderItemHistory',
@@ -84,6 +92,14 @@ export function download(params) {
   return request({
     url: '/orderItem/localFile/download',
     method: 'get',
+    params: params
+  })
+}
+
+export function fetcRefund(params) {
+  return request({
+    url: '/orderItem/refund',
+    method: 'post',
     params: params
   })
 }

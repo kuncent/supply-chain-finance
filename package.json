@@ -8,7 +8,8 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "build": "node build/build.js",
-    "build-qa": "node build/build-qa.js"
+    "build-qa": "node build/build-qa.js",
+    "build-prod": "node build/build-prod.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

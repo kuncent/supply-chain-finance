@@ -1,16 +1,6 @@
 <template>
   <div class="app-container">
     <el-card class="filter-container" shadow="never">
-      <div>
-        <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
-        <el-button style="float:right" type="primary" @click="handleSearchList()" size="small">查询搜索</el-button>
-        <el-button
-          style="float:right;margin-right: 15px"
-          @click="handleResetSearch()"
-          size="small"
-        >重置</el-button>
-      </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="父订单号：">
@@ -30,84 +20,95 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="创建时间：">
-            <el-date-picker
+            <!-- <el-date-picker
               class="input-width"
               v-model="listQuery.createTimeGe"
               value-format="yyyy-MM-dd"
               type="date"
               placeholder="请选择时间"
+            ></el-date-picker>-->
+            <el-date-picker
+              v-model="createTime"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
             ></el-date-picker>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
     <el-card class="operate-container" shadow="never">
-      <i class="el-icon-tickets"></i>
-      <span>历史导出记录</span>
-    </el-card>
-    <div class="table-container">
-      <el-table ref="orderTable" :data="list" style="width: 100%;" v-loading="listLoading" border>
-        <!-- <el-table-column type="selection"  align="center"></el-table-column> -->
-        <el-table-column label="操作时间" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
-        </el-table-column>
-        <el-table-column label="操作人" align="center">
-          <template slot-scope="scope">{{scope.row.subOrderSn}}</template>
-        </el-table-column>
-        <el-table-column label="导出条件" align="center">
-          <template slot-scope="scope">{{scope.row.createTime}}</template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <div class="batch-operate-container">
       <el-button
         class="search-button"
         @click="exportUnshippedOrderItem()"
         type="primary"
         size="small"
       >导出未发货订单</el-button>
+    </el-card>
+    <div class="table-container">
+      <el-table ref="orderTable" :data="list" style="width: 100%;" v-loading="listLoading" border>
+        <el-table-column label="操作时间" align="center">
+          <template slot-scope="scope">{{scope.row.createTime}}</template>
+        </el-table-column>
+        <el-table-column label="操作人" align="center">
+          <template slot-scope="scope">{{scope.row.username}}</template>
+        </el-table-column>
+        <el-table-column label="导出条件" align="center">
+          <template slot-scope="scope">{{scope.row.params}}</template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="batch-operate-container">
       <el-upload
         style="display:inline-block"
-        class="upload-demo"
-        action="https://jsonplaceholder.typicode.com/posts/"
+        action="http://mty-youquan.oss-cn-shenzhen.aliyuncs.com"
+        :data="dataObj"
         :on-change="handleChange"
         :file-list="fileList"
         :multiple="false"
+        :on-success="handleSuccess"
+        :before-upload="beforeUpload"
       >
-        <el-button size="small" type="primary">点击上传</el-button>
+        <el-button size="small" type="primary">导入物流信息</el-button>
       </el-upload>
-      <el-button size="small" type="primary" @click="uploadFile()">导入物流信息</el-button>
       <a href="http://www.keke66.cn/downLoadFile/物流模板.xlsx" download="物流上传模板.xlsx">
         <el-button class="search-button" type="primary" size="small">下载Excel模板</el-button>
       </a>
     </div>
-    <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :current-page.sync="listQuery.pageNum"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :total="total"
-      ></el-pagination>
-    </div>
-    <el-dialog title="关闭订单" :visible.sync="closeOrder.dialogVisible" width="30%">
-      <span style="vertical-align: top">操作备注：</span>
-      <el-input
-        style="width: 80%"
-        type="textarea"
-        :rows="5"
-        placeholder="请输入内容"
-        v-model="closeOrder.content"
-      ></el-input>
+    <el-dialog title="导入物流信息结果" :visible.sync="isUploadSucc" width="40%">
+      <el-form :inline="true" :model="uploadSuccOptions" size="small" label-width="140px">
+        <el-form-item label="发货子订单数量：">
+          <el-input
+            v-model="uploadSuccOptions.shipping"
+            class="input-width"
+            placeholder="父订单编号"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="更新物流单号数量：">
+          <el-input
+            v-model="uploadSuccOptions.update"
+            class="input-width"
+            placeholder="父订单编号"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="失败数量：">
+          <el-input
+            v-model="uploadSuccOptions.fail"
+            class="input-width"
+            placeholder="父订单编号"
+            disabled
+          ></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="closeOrder.dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleCloseOrderConfirm">确 定</el-button>
+        <el-button @click="isUploadSucc = false">取 消</el-button>
+        <el-button type="primary" @click="isUploadSucc = false">确 定</el-button>
       </span>
     </el-dialog>
-    <logistics-dialog v-model="logisticsDialogVisible"></logistics-dialog>
+    <!-- <logistics-dialog v-model="handleIsExport"></logistics-dialog> -->
   </div>
 </template>
 <script>
@@ -116,10 +117,12 @@ import {
   closeOrder,
   deleteOrder,
   exportUnshippedOrderItem,
-  uploadFile
+  uploadFile,
+  importShippingByUrl
 } from "@/api/order";
 import { formatDate } from "@/utils/date";
 import LogisticsDialog from "@/views/oms/order/components/logisticsDialog";
+import { policy } from "@/api/oss";
 const defaultListQuery = {
   pageNum: 1,
   pageSize: 10,
@@ -129,11 +132,11 @@ const defaultListQuery = {
   orderType: null,
   sourceType: null,
   createTimeGe: null,
-  deliveryTimeGe: null,
+  createTimeLe: null,
   status: 0,
   nicknameSearch: ""
 };
-const xxurl = process.env.BASE_API+'/localFile/upload';
+const xxurl = process.env.BASE_API + "/localFile/upload";
 export default {
   name: "childOrder",
   components: { LogisticsDialog },
@@ -150,25 +153,88 @@ export default {
         content: null,
         orderIds: []
       },
+      isUploadSucc: false,
+      uploadSuccOptions: {
+        fail: 0,
+        shipping: 0,
+        update: 0
+      },
       searchStatus: 0,
       logisticsDialogVisible: false,
       filesUrl: "",
       fileList: [],
-      xxurl:xxurl
+      dataObj: {
+        policy: "",
+        signature: "",
+        key: "",
+        ossaccessKeyId: "",
+        dir: "",
+        host: ""
+      },
+      listObj: {},
+      createTime: null,
+      isExport: false
     };
   },
   created() {
+    var now = new Date();
+    var start = new Date(0, 0, 0, 0, 0, 0, 0);
+    console.log(start);
+    var millis = now - start - 3600 * 1000 * 2.1;
+    var twoHoursAgo = new Date(0, 0, 0, 0, 0, 0, millis);
+    this.createTime = [twoHoursAgo, now];
     this.getList();
   },
   filters: {
     formatCreateTime(time) {
       let date = new Date(time);
+      console.log(formatDate(date, "yyyy-MM-dd hh:mm:ss"));
       return formatDate(date, "yyyy-MM-dd hh:mm:ss");
     }
   },
   methods: {
+    handleIsExport(){
+
+    },
     handleChange(file, fileList) {
       this.fileList = fileList.slice(-3);
+    },
+    handleSuccess(response, file) {
+      const url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+      importShippingByUrl({ url }).then(response => {
+        if (response.code === 200) {
+          this.uploadSuccOptions = response.data;
+          this.isUploadSucc = true;
+          this.handleSearchList();
+        }
+      });
+    },
+    beforeUpload(file) {
+      const _self = this;
+      const fileName = file.uid;
+      this.listObj[fileName] = {};
+      return new Promise((resolve, reject) => {
+        policy()
+          .then(response => {
+            _self.dataObj.policy = response.data.policy;
+            _self.dataObj.signature = response.data.signature;
+            _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
+            _self.dataObj.key = response.data.dir + "/${filename}";
+            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.host = response.data.host;
+            _self.listObj[fileName] = {
+              hasSuccess: false,
+              uid: file.uid,
+              width: this.width,
+              height: this.height
+            };
+            resolve(true);
+          })
+          .catch(err => {
+            console.log(err);
+            reject(false);
+          });
+      });
     },
     handleResetSearch() {
       this.listQuery = Object.assign({}, defaultListQuery);
@@ -204,6 +270,16 @@ export default {
       this.deleteOrder(ids);
     },
     exportUnshippedOrderItem() {
+      const createTime = this.createTime;
+      this.listQuery.createTimeGe = formatDate(
+        createTime[0],
+        "yyyy-MM-dd hh:mm:ss"
+      );
+      this.listQuery.createTimeLe = formatDate(
+        createTime[1],
+        "yyyy-MM-dd hh:mm:ss"
+      );
+      console.log(this.listQuery);
       exportUnshippedOrderItem(this.listQuery).then(response => {
         console.log(response);
         const fileKey = response.data.fileKey;
@@ -211,10 +287,8 @@ export default {
           process.env.BASE_API + "/localFile/download?fileKey=" + fileKey;
       });
     },
-    uploadFile(){
-      uploadFile(this.fileList[0]).then(response=>{
-
-      })
+    uploadFile() {
+      uploadFile(this.fileList[0]).then(response => {});
     },
     handleSizeChange(val) {
       this.listQuery.pageNum = 1;
@@ -252,8 +326,7 @@ export default {
       this.listLoading = true;
       fetchHistoryList({}).then(response => {
         this.listLoading = false;
-        this.list = response.data.list;
-        this.total = response.data.total;
+        this.list = response.data;
         console.log(this.list);
       });
     },
