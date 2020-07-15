@@ -30,7 +30,7 @@
       //最大上传图片数量
       maxCount:{
         type:Number,
-        default:6
+        default:30
       }
     },
     data() {

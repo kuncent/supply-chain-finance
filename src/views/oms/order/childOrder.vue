@@ -19,8 +19,8 @@
           <el-form-item label="子订单号：">
             <el-input v-model="listQuery.subOrderSn" class="input-width" placeholder="子订单编号"></el-input>
           </el-form-item>
-          <el-form-item label="会员名称：">
-            <el-input v-model="listQuery.nicknameSearch" class="input-width" placeholder="会员名称"></el-input>
+          <el-form-item label="用户昵称：">
+            <el-input v-model="listQuery.nicknameSearch" class="input-width" placeholder="用户昵称"></el-input>
           </el-form-item>
           <el-form-item label="收 货 人：">
             <el-input
@@ -83,6 +83,12 @@
         <el-table-column label="提交时间" width="180" align="center">
           <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
+        <el-table-column label="订单状态" width="120" align="center">
+          <template slot-scope="scope">{{statusTips[scope.row.status]}}</template>
+        </el-table-column>
+        <el-table-column label="退款状态" width="120" align="center">
+          <template slot-scope="scope">{{returnStatusTips[scope.row.returnStatus] || ''}}</template>
+        </el-table-column>
         <el-table-column label="用户Id" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
@@ -99,7 +105,7 @@
           <template slot-scope="scope">{{scope.row.productSn}}</template>
         </el-table-column>
         <el-table-column label="sku编号" align="center">
-          <template slot-scope="scope">{{scope.row.productSkuId}}</template>
+          <template slot-scope="scope">{{scope.row.productSkuCode}}</template>
         </el-table-column>
         <el-table-column label="规格" align="center">
           <template slot-scope="scope">{{scope.row.productAttrShow}}</template>
@@ -143,9 +149,6 @@
         <el-table-column label="订单备注" width="120" align="center">
           <template slot-scope="scope">{{scope.row.note}}</template>
         </el-table-column>
-        <el-table-column label="订单状态" width="120" align="center">
-          <template slot-scope="scope">{{statusTips[scope.row.status]}}</template>
-        </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
@@ -155,15 +158,15 @@
             >查看物流</el-button>
             <el-button
               size="mini"
-              @click="handleRefund(scope.row.id)"
+              @click="handleRefund(scope.row)"
               v-show="scope.row.status===1 || scope.row.status===2||scope.row.status===3"
             >退款</el-button>
             <!-- <el-button
               size="mini"
               type="danger"
-              @click="handleDeleteOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===4"
-            >删除订单</el-button>-->
+              @click="handleSendMsg(scope.$index, scope.row)"
+              v-show="scope.row.status > 1"
+            >发送通知</el-button> -->
           </template>
         </el-table-column>
       </el-table>
@@ -223,9 +226,28 @@
       </span>
     </el-dialog>
     <el-dialog title="确定退款" :visible.sync="isRefundConfim" width="30%">
+      <p>确认子订单【{{this.refundId}}】退款，金额【{{refundIdMoney}}】元</p>
+      <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
+          <el-form-item label="备注：">
+            <el-input v-model="listQuery.orderSn" class="input-width" placeholder="父订单编号"></el-input>
+          </el-form-item>
+          <el-form-item label="当前账号密码：">
+            <el-input v-model="listQuery.subOrderSn" class="input-width" placeholder="当前账号密码："></el-input>
+          </el-form-item>
+        </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isRefundConfim = false">取 消</el-button>
         <el-button type="primary" @click="refundConfim">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="发送通知" :visible.sync="isSendMsgConfim" width="30%">
+      <span>发送子订单【{{childOrder}}】通知</span><br>
+      <el-radio v-model="type" label="1">订单配送通知</el-radio><br>
+      <el-radio v-model="type" label="2">订单签收通知</el-radio><br>
+      <el-radio v-model="type" label="3">退款成功通知</el-radio>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isSendMsgConfim = false">取 消</el-button>
+        <el-button type="primary" @click="sendMsg">确 定</el-button>
       </span>
     </el-dialog>
     <logistics-dialog v-model="logisticsDialogVisible"></logistics-dialog>
@@ -238,7 +260,8 @@ import {
   deleteOrder,
   exportUnshippedOrderItem,
   viewDelivery,
-  fetcRefund
+  fetcRefund,
+  sendMsg
 } from "@/api/order";
 import { formatDate } from "@/utils/date";
 import LogisticsDialog from "@/views/oms/order/components/logisticsDialog";
@@ -265,6 +288,7 @@ export default {
       list: null,
       total: null,
       operateType: null,
+      childOrder: null,
       multipleSelection: [],
       closeOrder: {
         dialogVisible: false,
@@ -278,6 +302,12 @@ export default {
         "2": "已发货",
         "3": "已完成",
         "4": "已关闭"
+      },
+      returnStatusTips: {
+        "-1": "未退款",
+        "0": "退款中",
+        "1": "退款成功",
+        "2": "退款失败"
       },
       statusOptions: [
         {
@@ -343,7 +373,9 @@ export default {
       viewDeliveryDilog: false,
       deliveryList: [],
       isRefundConfim: false,
-      refundId: null
+      isSendMsgConfim: false,
+      refundId: null,
+      type: '1'
     };
   },
   created() {
@@ -387,9 +419,10 @@ export default {
     }
   },
   methods: {
-    handleRefund(id) {
+    handleRefund(row) {
       this.isRefundConfim = true;
-      this.refundId = id;
+      this.refundId = row.id;
+      this.refundIdMoney = row.costPrice;
     },
     refundConfim() {
       fetcRefund({ id: this.refundId }).then(response => {});
@@ -419,6 +452,21 @@ export default {
         this.viewDeliveryDilog = true;
         this.deliveryList = list;
         console.log(this.deliveryList);
+      });
+    },
+    handleSendMsg(index, row) {
+      this.isSendMsgConfim = true;
+      this.childOrder = row.subOrderSn;
+    },
+    sendMsg() {
+      sendMsg({ id: this.childOrder, type: this.type }).then(response => {
+        if (response.code === 200) {
+          this.isSendMsgConfim = false;
+          this.$message({
+            message: "发送成功",
+            type: "success"
+          });
+        }
       });
     },
     handleDeliveryOrder(index, row) {

@@ -104,6 +104,14 @@ export function fetcRefund(params) {
   })
 }
 
+export function sendMsg(params) {
+  return request({
+    url: '/orderItem/sendMsg',
+    method: 'post',
+    params: params
+  })
+}
+
 export function viewDelivery(id) {
   return request({
     url: '/orderItem/logistics?id='+id,

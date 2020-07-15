@@ -146,7 +146,7 @@
       <el-form-item label="商品详情：">
         <multi-upload v-model="selectProducDetailtPics"></multi-upload>
       </el-form-item>
-      <el-form-item label="规格参数：">
+      <!-- <el-form-item label="规格参数：">
         <el-tabs v-model="activeHtmlName" type="card">
           <el-tab-pane label="电脑端详情" name="pc">
             <tinymce :width="595" :height="300" v-model="value.detailHtml"></tinymce>
@@ -155,7 +155,7 @@
             <tinymce :width="595" :height="300" v-model="value.detailMobileHtml"></tinymce>
           </el-tab-pane>
         </el-tabs>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item style="text-align: center">
         <el-button size="medium" @click="handlePrev">上一步，填写商品促销</el-button>
         <el-button type="primary" size="medium" @click="handleNext">下一步，选择商品关联</el-button>
@@ -211,7 +211,7 @@
       productId(){
         return this.value.id;
       },
-      //商品的主图和画册图片
+      //商品的主图
       selectProductPics:{
         get:function () {
           let pics=[];
@@ -246,17 +246,18 @@
           }
         }
       },
+      //商品详情图
       selectProducDetailtPics:{
         get:function () {
           let pics=[];
-          if(this.value.pic===undefined||this.value.pic==null||this.value.pic===''){
+          if(this.value.pics===undefined||this.value.pics==null||this.value.pics===''){
             return pics;
           }
-          pics.push(this.value.pic);
+          pics.push(this.value.pics);
           if(this.value.detailPics ===undefined||this.value.detailPics ==null||this.value.detailPics ===''){
             return pics;
           }
-          let detailPics  = this.value.detailPics .split(',');
+          let detailPics  = this.value.detailPics.split(',');
           for(let i=0;i<detailPics .length;i++){
             pics.push(detailPics [i]);
           }
@@ -264,10 +265,10 @@
         },
         set:function (newValue) {
           if (newValue == null || newValue.length === 0) {
-            this.value.pic = null;
+            this.value.pics = null;
             this.value.detailPics  = null;
           } else {
-            this.value.pic = newValue[0];
+            this.value.pics = newValue[0];
             this.value.detailPics  = '';
             if (newValue.length > 1) {
               for (let i = 1; i < newValue.length; i++) {
