@@ -250,10 +250,6 @@
       selectProducDetailtPics:{
         get:function () {
           let pics=[];
-          if(this.value.pics===undefined||this.value.pics==null||this.value.pics===''){
-            return pics;
-          }
-          pics.push(this.value.pics);
           if(this.value.detailPics ===undefined||this.value.detailPics ==null||this.value.detailPics ===''){
             return pics;
           }
@@ -265,10 +261,8 @@
         },
         set:function (newValue) {
           if (newValue == null || newValue.length === 0) {
-            this.value.pics = null;
             this.value.detailPics  = null;
           } else {
-            this.value.pics = newValue[0];
             this.value.detailPics  = '';
             if (newValue.length > 1) {
               for (let i = 1; i < newValue.length; i++) {

@@ -8,3 +8,11 @@ export function fetchList(params) {
     params: params
   })
 }
+
+export function sendGift(params) {
+  return request({
+    url: '/umsMember/addGiftAmount',
+    method: 'post',
+    params: params
+  })
+}

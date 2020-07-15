@@ -50,6 +50,7 @@
     description: '',
     detailDesc: '',
     detailHtml: '',
+    detailPics:'',
     detailMobileHtml: '',
     detailTitle: '',
     feightTemplateId: 0,

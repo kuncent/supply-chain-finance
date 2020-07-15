@@ -161,12 +161,12 @@
               @click="handleRefund(scope.row)"
               v-show="scope.row.status===1 || scope.row.status===2||scope.row.status===3"
             >退款</el-button>
-            <!-- <el-button
+            <el-button
               size="mini"
               type="danger"
               @click="handleSendMsg(scope.$index, scope.row)"
               v-show="scope.row.status > 1"
-            >发送通知</el-button> -->
+            >发送通知</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -227,23 +227,26 @@
     </el-dialog>
     <el-dialog title="确定退款" :visible.sync="isRefundConfim" width="30%">
       <p>确认子订单【{{this.refundId}}】退款，金额【{{refundIdMoney}}】元</p>
-      <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="备注：">
-            <el-input v-model="listQuery.orderSn" class="input-width" placeholder="父订单编号"></el-input>
-          </el-form-item>
-          <el-form-item label="当前账号密码：">
-            <el-input v-model="listQuery.subOrderSn" class="input-width" placeholder="当前账号密码："></el-input>
-          </el-form-item>
-        </el-form>
+      <el-form :inline="true" :model="refundQuery" size="small" label-width="140px">
+        <el-form-item label="备注：">
+          <el-input v-model="refundQuery.note" class="input-width" placeholder="备注说明"></el-input>
+        </el-form-item>
+        <el-form-item label="当前账号密码：">
+          <el-input v-model="refundQuery.password" class="input-width" placeholder="当前账号密码：" type="password"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isRefundConfim = false">取 消</el-button>
         <el-button type="primary" @click="refundConfim">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog title="发送通知" :visible.sync="isSendMsgConfim" width="30%">
-      <span>发送子订单【{{childOrder}}】通知</span><br>
-      <el-radio v-model="type" label="1">订单配送通知</el-radio><br>
-      <el-radio v-model="type" label="2">订单签收通知</el-radio><br>
+      <span>发送子订单【{{childOrder}}】通知</span>
+      <br />
+      <el-radio v-model="type" label="1">订单配送通知</el-radio>
+      <br />
+      <el-radio v-model="type" label="2">订单签收通知</el-radio>
+      <br />
       <el-radio v-model="type" label="3">退款成功通知</el-radio>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isSendMsgConfim = false">取 消</el-button>
@@ -375,7 +378,13 @@ export default {
       isRefundConfim: false,
       isSendMsgConfim: false,
       refundId: null,
-      type: '1'
+      refundIdMoney: 0,
+      refundQuery: {
+        password: "",
+        remarks: "",
+        id:""
+      },
+      type: "1"
     };
   },
   created() {
@@ -425,7 +434,10 @@ export default {
       this.refundIdMoney = row.costPrice;
     },
     refundConfim() {
-      fetcRefund({ id: this.refundId }).then(response => {});
+      this.refundQuery.id = this.refundId;
+      fetcRefund(this.refundQuery).then(response => {
+
+      });
       this.isRefundConfim = false;
     },
     handleResetSearch() {
@@ -456,16 +468,16 @@ export default {
     },
     handleSendMsg(index, row) {
       this.isSendMsgConfim = true;
-      this.childOrder = row.subOrderSn;
+      this.childOrder = row.id;
     },
     sendMsg() {
       sendMsg({ id: this.childOrder, type: this.type }).then(response => {
         if (response.code === 200) {
           this.isSendMsgConfim = false;
-          this.$message({
-            message: "发送成功",
-            type: "success"
-          });
+          // this.$message({
+          //   message: "发送成功",
+          //   type: "success"
+          // });
         }
       });
     },
