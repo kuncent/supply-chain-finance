@@ -25,19 +25,19 @@ export function lotteryListItem(params) {
   })
 }
 
-export function lotteryCreate(params) {
+export function lotteryCreate(data) {
   return request({
     url: '/luckdraw/create',
     method: 'post',
-    params: params
+    data: data
   })
 }
 
-export function lotteryCreateItem(params) {
+export function lotteryCreateItem(data) {
   return request({
     url: '/luckdraw/createItem',
     method: 'post',
-    params: params
+    data: data
   })
 }
 
@@ -65,11 +65,11 @@ export function lotteryRelease(params) {
   })
 }
 
-export function lotteryUpdate(params) {
+export function lotteryUpdate(data) {
   return request({
     url: '/luckdraw/update',
     method: 'post',
-    params: params
+    data: data
   })
 }
 

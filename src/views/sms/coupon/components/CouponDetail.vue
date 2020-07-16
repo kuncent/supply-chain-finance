@@ -277,6 +277,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$router)
     if (this.isEdit) {
       getCoupon(this.$route.query.id).then(response => {
         this.coupon = response.data;

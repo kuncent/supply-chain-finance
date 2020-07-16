@@ -1,450 +1,346 @@
 <template>
-  <el-card class="form-container" shadow="never">
-    <el-form :model="coupon" :rules="rules" ref="couponFrom" label-width="150px" size="small">
-      <el-form-item label="优惠券类型：">
-        <el-select v-model="coupon.type">
-          <el-option
-            v-for="type in typeOptions"
-            :key="type.value"
-            :label="type.label"
-            :value="type.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="优惠券名称：" prop="name">
-        <el-input v-model="coupon.name" class="input-width"></el-input>
-      </el-form-item>
-      <el-form-item label="适用平台：">
-        <el-select v-model="coupon.platform">
-          <el-option
-            v-for="item in platformOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="总发行量：" prop="publishCount">
-        <el-input v-model.number="coupon.publishCount" placeholder="只能输入正整数" class="input-width"></el-input>
-      </el-form-item>
-      <el-form-item label="面额：" prop="amount">
-        <el-input v-model.number="coupon.amount" placeholder="面值只能是数值，限2位小数" class="input-width">
-          <template slot="append">元</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="每人限领：">
-        <el-input v-model="coupon.perLimit" placeholder="只能输入正整数" class="input-width">
-          <template slot="append">张</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="使用门槛：" prop="minPoint">
-        <el-input v-model.number="coupon.minPoint" placeholder="只能输入正整数" class="input-width">
-          <template slot="prepend">满</template>
-          <template slot="append">元可用</template>
-        </el-input>
-      </el-form-item>
-      <el-form-item label="有效期：">
-        <el-date-picker
-          type="date"
-          placeholder="选择日期"
-          v-model="coupon.startTime"
-          style="width: 150px"
-        ></el-date-picker>
-        <span style="margin-left: 20px;margin-right: 20px">至</span>
-        <el-date-picker
-          type="date"
-          placeholder="选择日期"
-          v-model="coupon.endTime"
-          style="width: 150px"
-        ></el-date-picker>
-        <br />
-        <div class="padding10">
-          <el-radio v-model="coupon.dateCouponType" label="0">
-            领券当日起
-            <el-input v-model="coupon.days" class="input-width-short" placeholder="天数"></el-input>天内可用
-          </el-radio>
-        </div>
-        <div class="padding10">
-          <el-radio v-model="coupon.dateCouponType" label="1">
-            领券次日起
-            <el-input v-model="coupon.days" class="input-width-short" placeholder="天数"></el-input>天内可用
-          </el-radio>
-        </div>
-      </el-form-item>
-      <el-form-item label="可使用商品：">
-        <el-radio-group v-model="coupon.useType">
-          <el-radio-button :label="0">全场通用</el-radio-button>
-          <!-- <el-radio-button :label="1">指定分类</el-radio-button>
-          <el-radio-button :label="2">指定商品</el-radio-button>-->
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item v-show="coupon.useType===1">
-        <el-cascader
-          clearable
-          placeholder="请选择分类名称"
-          v-model="selectProductCate"
-          :options="productCateOptions"
-        ></el-cascader>
-        <el-button @click="handleAddProductCategoryRelation()">添加</el-button>
-        <el-table
-          ref="productCateRelationTable"
-          :data="coupon.productCategoryRelationList"
-          style="width: 100%;margin-top: 20px"
-          border
-        >
-          <el-table-column label="分类名称" align="center">
-            <template
-              slot-scope="scope"
-            >{{scope.row.parentCategoryName}}>{{scope.row.productCategoryName}}</template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" width="100">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                type="text"
-                @click="handleDeleteProductCateRelation(scope.$index, scope.row)"
-              >删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-form-item>
-      <el-form-item v-show="coupon.useType===2">
-        <el-select
-          v-model="selectProduct"
-          filterable
-          remote
-          reserve-keyword
-          placeholder="商品名称/商品货号"
-          :remote-method="searchProductMethod"
-          :loading="selectProductLoading"
-        >
-          <el-option
-            v-for="item in selectProductOptions"
-            :key="item.productId"
-            :label="item.productName"
-            :value="item.productId"
-          >
-            <span style="float: left">{{ item.productName }}</span>
-            <span style="float: right; color: #8492a6; font-size: 13px">NO.{{ item.productSn }}</span>
-          </el-option>
-        </el-select>
-        <el-button @click="handleAddProductRelation()">添加</el-button>
-        <el-table
-          ref="productRelationTable"
-          :data="coupon.productRelationList"
-          style="width: 100%;margin-top: 20px"
-          border
-        >
-          <el-table-column label="商品名称" align="center">
-            <template slot-scope="scope">{{scope.row.productName}}</template>
-          </el-table-column>
-          <el-table-column label="货号" align="center" width="120">
-            <template slot-scope="scope">NO.{{scope.row.productSn}}</template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" width="100">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                type="text"
-                @click="handleDeleteProductRelation(scope.$index, scope.row)"
-              >删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-form-item>
-      <el-form-item label="备注：">
-        <el-input
-          class="input-width"
-          type="textarea"
-          :rows="5"
-          placeholder="请输入内容"
-          v-model="coupon.note"
-        ></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit('couponFrom')">提交</el-button>
-        <el-button v-if="!isEdit" @click="resetForm('couponFrom')">重置</el-button>
-      </el-form-item>
-    </el-form>
-  </el-card>
+  <div class="app-container">
+    <el-card class="operate-container" shadow="never">
+      <i class="el-icon-tickets"></i>
+      <span>数据列表</span>
+      <el-button size="mini" class="btn-add" @click="handleAdd()">添加</el-button>
+    </el-card>
+    <div class="table-container">
+      <el-table
+        ref="couponTable"
+        :data="list"
+        style="width: 100%;"
+        @selection-change="handleSelectionChange"
+        v-loading="listLoading"
+        border
+      >
+        <el-table-column label="奖品名称" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.itemName}}</template>
+        </el-table-column>
+        <el-table-column label="类型" align="center">
+          <template slot-scope="scope">{{scope.row.type}}</template>
+        </el-table-column>
+        <el-table-column label="图片" width="120" align="center">
+          <template slot-scope="scope">
+            <img style="height: 80px" :src="scope.row.imgUrl" />
+          </template>
+        </el-table-column>
+        <el-table-column label="积分数量" align="center">
+          <template slot-scope="scope">{{scope.row.awardTotal}}</template>
+        </el-table-column>
+        <el-table-column label="优惠券" align="center">
+          <template slot-scope="scope">优惠券{{scope.row.couponId}}</template>
+        </el-table-column>
+        <el-table-column label="奖品数量" align="center">
+          <template slot-scope="scope">{{scope.row.awardTotal}}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" align="center">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="handleUpdate(scope.$index, scope.row)">修改</el-button>
+            <el-button size="mini" type="text" @click="handleOffShelves(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        layout="total, sizes,prev, pager, next,jumper"
+        :current-page.sync="listQuery.pageNum"
+        :page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15]"
+        :total="total"
+      ></el-pagination>
+    </div>
+    <el-dialog title="添加奖项" :visible.sync="createOptions.showDilog" width="30%">
+      <el-form :inline="true" :model="createOptions" size="small" label-width="140px">
+        <el-form-item label="奖品名称: ">
+          <el-input placeholder v-model="createOptions.itemName"></el-input>
+        </el-form-item>
+        <el-form-item label="概率: ">
+          <el-input placeholder v-model="createOptions.luckRatio"></el-input>
+        </el-form-item>
+        <el-form-item label="图片: ">
+          <single-upload
+            v-model="createOptions.imgUrl"
+            style="width: 300px;display: inline-block;margin-left: 10px"
+          ></single-upload>
+        </el-form-item>
+        <el-form-item label="奖品数量: ">
+          <el-input placeholder v-model="createOptions.awardTotal"></el-input>
+        </el-form-item>
+        <el-form-item label="奖品类型：">
+          <el-radio v-model="updateOptions.type" label="0">优惠券</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.type" label="1">积分</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="createOptions.showDilog = false">取 消</el-button>
+        <el-button type="primary" @click="handleCreateConfirm">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="修改奖项" :visible.sync="updateDilog" width="30%">
+      <el-form :inline="true" :model="updateOptions" size="small" label-width="140px">
+        <el-form-item label="奖品名称: ">
+          <el-input placeholder v-model="updateOptions.itemName"></el-input>
+        </el-form-item>
+        <el-form-item label="概率: ">
+          <el-input placeholder v-model="updateOptions.luckRatio"></el-input>
+        </el-form-item>
+        <el-form-item label="图片: ">
+          <single-upload
+            v-model="updateOptions.imgUrl"
+            style="width: 300px;display: inline-block;margin-left: 10px"
+          ></single-upload>
+        </el-form-item>
+        <el-form-item label="奖品数量: ">
+          <el-input placeholder v-model="updateOptions.awardTotal"></el-input>
+        </el-form-item>
+        <el-form-item label="奖品类型：">
+          <el-radio v-model="updateOptions.type" label="0">优惠券</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.type" label="1">积分</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="createOptions.showDilog = false">取 消</el-button>
+        <el-button type="primary" @click="handleUpdatefirm">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="发布" :visible.sync="releaseDilog" width="30%">
+      <span style="vertical-align: top">确认发布？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="releaseDilog = false">取 消</el-button>
+        <el-button type="primary" @click="lotteryRelease">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="下线" :visible.sync="offShelvesDilog" width="30%">
+      <span style="vertical-align: top">确认删除？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="offShelvesDilog = false">取 消</el-button>
+        <el-button type="primary" @click="lotteryOffShelves">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 <script>
-import { createCoupon, getCoupon, updateCoupon } from "@/api/coupon";
-import { fetchSimpleList as fetchProductList } from "@/api/product";
-import { fetchListWithChildren } from "@/api/productCate";
-const defaultCoupon = {
-  dateCouponType: "0",
-  days: '0',
-  type: 0,
+import {
+  fetchList,
+  lotteryDict,
+  lotteryCreate,
+  lotteryOffShelves,
+  lotteryRelease,
+  lotteryListItem,
+  lotteryCreateItem,
+  lotteryUpdateItem,
+  lotteryDeleteItem
+} from "@/api/lottery";
+import { formatDate } from "@/utils/date";
+import SingleUpload from "@/components/Upload/singleUpload";
+const defaultListQuery = {
+  pageNum: 1,
+  pageSize: 10,
   name: null,
-  platform: 0,
-  amount: null,
-  perLimit: 1,
-  minPoint: null,
-  startTime: null,
-  endTime: null,
-  useType: 0,
-  note: null,
-  publishCount: null,
-  productRelationList: [],
-  productCategoryRelationList: []
+  type: null
 };
 const defaultTypeOptions = [
   {
     label: "全场赠券",
     value: 0
-  },
-  {
-    label: "会员赠券",
-    value: 1
-  },
-  {
-    label: "购物赠券",
-    value: 2
-  },
-  {
-    label: "注册赠券",
-    value: 3
   }
 ];
-const defaultPlatformOptions = [
-  {
-    label: "全平台",
-    value: 0
-  },
-  {
-    label: "移动平台",
-    value: 1
-  },
-  {
-    label: "PC平台",
-    value: 2
-  }
-];
+const defaultCreateOptions = {
+  showDilog: false,
+  awardId: 0,
+  awardTotal: 0,
+  couponId: 0,
+  defineId: 0,
+  imgUrl: "",
+  itemName: "",
+  luckRatio: 0,
+  points: 0,
+  type: '0'
+};
 export default {
-  name: "CouponDetail",
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    }
-  },
+  name: "couponList",
+  components: { SingleUpload },
   data() {
     return {
-      coupon: Object.assign({}, defaultCoupon),
+      listQuery: Object.assign({}, defaultListQuery),
       typeOptions: Object.assign({}, defaultTypeOptions),
-      platformOptions: Object.assign({}, defaultPlatformOptions),
-      rules: {
-        name: [
-          { required: true, message: "请输入优惠券名称", trigger: "blur" },
-          {
-            min: 2,
-            max: 140,
-            message: "长度在 2 到 140 个字符",
-            trigger: "blur"
-          }
-        ],
-        publishCount: [
-          {
-            type: "number",
-            required: true,
-            message: "只能输入正整数",
-            trigger: "blur"
-          }
-        ],
-        amount: [
-          {
-            type: "number",
-            required: true,
-            message: "面值只能是数值，0.01-10000，限2位小数",
-            trigger: "blur"
-          }
-        ],
-        minPoint: [
-          {
-            type: "number",
-            required: true,
-            message: "只能输入正整数",
-            trigger: "blur"
-          }
-        ]
-      },
-      selectProduct: null,
-      selectProductLoading: false,
-      selectProductOptions: [],
-      selectProductCate: null,
-      productCateOptions: []
+      createOptions: Object.assign({}, defaultCreateOptions),
+      updateOptions: Object.assign({}, defaultCreateOptions),
+      list: null,
+      total: null,
+      listLoading: false,
+      multipleSelection: [],
+      releaseDilog: false,
+      offShelvesDilog: false,
+      updateDilog: false,
+      statusOptions: [
+        {
+          label: "未发布",
+          value: 0
+        },
+        {
+          label: "已发布",
+          value: 1
+        }
+      ],
+      id: null,
+      row: null
     };
   },
   created() {
-    if (this.isEdit) {
-      getCoupon(this.$route.query.id).then(response => {
-        this.coupon = response.data;
-      });
+    console.log(this.$router);
+    this.id = this.$route.query.id;
+    this.getList();
+  },
+  filters: {
+    formatType(type) {
+      for (let i = 0; i < defaultTypeOptions.length; i++) {
+        if (type === defaultTypeOptions[i].value) {
+          return defaultTypeOptions[i].label;
+        }
+      }
+      return "";
+    },
+    formatUseType(useType) {
+      if (useType === 0) {
+        return "全场通用";
+      } else if (useType === 1) {
+        return "指定分类";
+      } else {
+        return "指定商品";
+      }
+    },
+    formatPlatform(platform) {
+      if (platform === 1) {
+        return "移动平台";
+      } else if (platform === 2) {
+        return "PC平台";
+      } else {
+        return "全平台";
+      }
+    },
+    formatDate(time) {
+      if (time == null || time === "") {
+        return "N/A";
+      }
+      let date = new Date(time);
+      return formatDate(date, "yyyy-MM-dd:hh-mm-ss");
+    },
+    formatStatus(endTime) {
+      let now = new Date().getTime();
+      let endDate = new Date(endTime);
+      if (endDate > now) {
+        return "未过期";
+      } else {
+        return "已过期";
+      }
     }
-    this.getProductCateList();
   },
   methods: {
-    onSubmit(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.$confirm("是否提交数据", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning"
-          }).then(() => {
-            if (this.isEdit) {
-              updateCoupon(this.$route.query.id, this.coupon).then(response => {
-                this.$refs[formName].resetFields();
-                this.$message({
-                  message: "修改成功",
-                  type: "success",
-                  duration: 1000
-                });
-                this.$router.back();
-              });
-            } else {
-              createCoupon(this.coupon).then(response => {
-                this.$refs[formName].resetFields();
-                this.$message({
-                  message: "提交成功",
-                  type: "success",
-                  duration: 1000
-                });
-                this.$router.back();
-              });
-            }
-          });
-        } else {
+    handleCreateConfirm() {
+      console.log(this.createOptions);
+      this.createOptions.type = Number(this.createOptions.type)
+      lotteryCreateItem(this.createOptions).then(response => {
+        this.createOptions.showDilog = false;
+        this.getList();
+      });
+    },
+    handleUpdatefirm() {
+      lotteryUpdateItem(this.updateOptions).then(response => {
+        this.updateDilog = false;
+        this.getList();
+      });
+    },
+    handleRelease(index, row) {
+      this.row = row;
+      this.releaseDilog = true;
+    },
+    lotteryRelease() {
+      lotteryRelease({ id: this.row.id }).then(response => {
+        this.releaseDilog = false;
+        this.getList();
+      });
+    },
+    lotteryOffShelves() {
+      lotteryDeleteItem({ id: this.row.id }).then(response => {
+        this.offShelvesDilog = false;
+        this.getList();
+      });
+    },
+    handleUpdate(index, row) {
+      this.updateDilog = true;
+      this.updateOptions = row;
+      this.updateOptions.type = row.type + '';
+    },
+    handleUpdateItem(index, row) {
+      this.$router.push({ path: "/sms/updateLottery", query: { id: row.id } });
+    },
+    handleOffShelves(index, row) {
+      this.row = row;
+      this.offShelvesDilog = true;
+    },
+    handleResetSearch() {
+      this.listQuery = Object.assign({}, defaultListQuery);
+    },
+    handleSearchList() {
+      this.listQuery.pageNum = 1;
+      this.getList();
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    handleSizeChange(val) {
+      this.listQuery.pageNum = 1;
+      this.listQuery.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.listQuery.pageNum = val;
+      this.getList();
+    },
+    handleAdd() {
+      this.createOptions.showDilog = true;
+    },
+    handleDelete(index, row) {
+      this.$confirm("是否进行删除操作?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteCoupon(row.id).then(response => {
           this.$message({
-            message: "验证失败",
-            type: "error",
-            duration: 1000
+            type: "success",
+            message: "删除成功!"
           });
-          return false;
-        }
+          this.getList();
+        });
       });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.coupon = Object.assign({}, defaultCoupon);
-    },
-    searchProductMethod(query) {
-      if (query !== "") {
-        this.loading = true;
-        fetchProductList({ keyword: query }).then(response => {
-          this.loading = false;
-          let productList = response.data;
-          this.selectProductOptions = [];
-          for (let i = 0; i < productList.length; i++) {
-            let item = productList[i];
-            this.selectProductOptions.push({
-              productId: item.id,
-              productName: item.name,
-              productSn: item.productSn
-            });
-          }
-        });
-      } else {
-        this.selectProductOptions = [];
-      }
-    },
-    handleAddProductRelation() {
-      if (this.selectProduct === null) {
-        this.$message({
-          message: "请先选择商品",
-          type: "warning"
-        });
-        return;
-      }
-      this.coupon.productRelationList.push(
-        this.getProductById(this.selectProduct)
-      );
-      this.selectProduct = null;
-    },
-    handleDeleteProductRelation(index, row) {
-      this.coupon.productRelationList.splice(index, 1);
-    },
-    handleAddProductCategoryRelation() {
-      if (
-        this.selectProductCate === null ||
-        this.selectProductCate.length === 0
-      ) {
-        this.$message({
-          message: "请先选择商品分类",
-          type: "warning"
-        });
-        return;
-      }
-      this.coupon.productCategoryRelationList.push(
-        this.getProductCateByIds(this.selectProductCate)
-      );
-      this.selectProductCate = [];
-    },
-    handleDeleteProductCateRelation(index, row) {
-      this.coupon.productCategoryRelationList.splice(index, 1);
-    },
-    getProductById(id) {
-      for (let i = 0; i < this.selectProductOptions.length; i++) {
-        if (id === this.selectProductOptions[i].productId) {
-          return this.selectProductOptions[i];
-        }
-      }
-      return null;
-    },
-    getProductCateList() {
-      fetchListWithChildren().then(response => {
-        let list = response.data;
-        this.productCateOptions = [];
-        for (let i = 0; i < list.length; i++) {
-          let children = [];
-          if (list[i].children != null && list[i].children.length > 0) {
-            for (let j = 0; j < list[i].children.length; j++) {
-              children.push({
-                label: list[i].children[j].name,
-                value: list[i].children[j].id
-              });
-            }
-          }
-          this.productCateOptions.push({
-            label: list[i].name,
-            value: list[i].id,
-            children: children
-          });
-        }
+    getList() {
+      this.listLoading = true;
+      lotteryListItem({ defineId: this.id }).then(response => {
+        this.listLoading = false;
+        this.list = response.data;
+        this.total = response.data.total;
       });
-    },
-    getProductCateByIds(ids) {
-      let name;
-      let parentName;
-      for (let i = 0; i < this.productCateOptions.length; i++) {
-        if (this.productCateOptions[i].value === ids[0]) {
-          parentName = this.productCateOptions[i].label;
-          for (let j = 0; j < this.productCateOptions[i].children.length; j++) {
-            if (this.productCateOptions[i].children[j].value === ids[1]) {
-              name = this.productCateOptions[i].children[j].label;
-            }
-          }
-        }
-      }
-      return {
-        productCategoryId: ids[1],
-        productCategoryName: name,
-        parentCategoryName: parentName
-      };
     }
   }
 };
 </script>
 <style scoped>
 .input-width {
-  width: 60%;
-}
-.input-width-short {
-  width: 20%;
-}
-.padding10{
-  padding-top: 10px;
+  width: 203px;
 }
 </style>
 
