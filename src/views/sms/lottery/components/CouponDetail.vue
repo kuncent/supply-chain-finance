@@ -18,7 +18,7 @@
           <template slot-scope="scope">{{scope.row.itemName}}</template>
         </el-table-column>
         <el-table-column label="类型" align="center">
-          <template slot-scope="scope">{{scope.row.type}}</template>
+          <template slot-scope="scope">{{type_Obj[scope.row.type]}}</template>
         </el-table-column>
         <el-table-column label="图片" width="120" align="center">
           <template slot-scope="scope">
@@ -26,13 +26,13 @@
           </template>
         </el-table-column>
         <el-table-column label="积分数量" align="center">
-          <template slot-scope="scope">{{scope.row.awardTotal}}</template>
+          <template slot-scope="scope">{{scope.row.points }}</template>
         </el-table-column>
         <el-table-column label="优惠券" align="center">
           <template slot-scope="scope">优惠券{{scope.row.couponId}}</template>
         </el-table-column>
         <el-table-column label="奖品数量" align="center">
-          <template slot-scope="scope">{{scope.row.awardTotal}}</template>
+          <template slot-scope="scope">{{scope.row.awardTotal === -1 ? '不限量' : scope.row.awardTotal}}</template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
@@ -78,10 +78,15 @@
           <br />
           <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
         </el-form-item>
-        <el-form-item label="优惠券：">
-          <el-radio v-model="updateOptions.flag" label="-1">优惠券</el-radio>
-          <br />
-          <el-radio v-model="updateOptions.flag" label="0">积分</el-radio>
+        <el-form-item label="优惠券" v-if="updateOptions.type==0">
+          <el-select v-model="updateOptions.couponId" placeholder="请选择">
+            <el-option
+              v-for="item in couponList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -113,10 +118,15 @@
           <br />
           <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
         </el-form-item>
-        <el-form-item label="优惠券：">
-          <el-radio v-model="updateOptions.flag" label="-1">优惠券</el-radio>
-          <br />
-          <el-radio v-model="updateOptions.type" label="0">积分</el-radio>
+        <el-form-item label="优惠券" v-if="updateOptions.type==0">
+          <el-select v-model="updateOptions.couponId" placeholder="请选择">
+            <el-option
+              v-for="item in couponList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -152,6 +162,7 @@ import {
   lotteryUpdateItem,
   lotteryDeleteItem
 } from "@/api/lottery";
+import {fetchList as getCouponList} from "@/api/coupon";
 import { formatDate } from "@/utils/date";
 import SingleUpload from "@/components/Upload/singleUpload";
 const defaultListQuery = {
@@ -168,19 +179,17 @@ const defaultTypeOptions = [
 ];
 const defaultCreateOptions = {
   showDilog: false,
-  awardId: null,
-  awardTotal: -1,
-  couponId: 24,
-  couponName: "",
-  defineId: 1,
-  id: 2,
-  imgUrl: null,
+  awardId: 0,
+  awardTotal: 0,
+  couponId: null,
+  defineId: 0,
+  imgUrl: "",
   itemName: "",
-  luckRatio: 10000,
-  points: null,
-  type: "0",
-  flag: "-1"
+  luckRatio: 0,
+  points: 0,
+  type: '0'
 };
+
 export default {
   name: "couponList",
   components: { SingleUpload },
@@ -208,22 +217,24 @@ export default {
         }
       ],
       id: null,
-      row: null
+      row: null,
+      type_Obj: {
+        '0': '优惠券',
+        '1': '积分',
+        '2': '赠品'
+      },
+      couponList: []
     };
   },
   created() {
     console.log(this.$router);
     this.id = this.$route.query.id;
     this.getList();
+    this.getCouponList();
   },
   filters: {
     formatType(type) {
-      for (let i = 0; i < defaultTypeOptions.length; i++) {
-        if (type === defaultTypeOptions[i].value) {
-          return defaultTypeOptions[i].label;
-        }
-      }
-      return "";
+
     },
     formatUseType(useType) {
       if (useType === 0) {
@@ -262,6 +273,8 @@ export default {
   },
   methods: {
     handleCreateConfirm() {
+      console.log(this.createOptions);
+      this.createOptions.type = Number(this.createOptions.type)
       lotteryCreateItem(this.createOptions).then(response => {
         this.createOptions.showDilog = false;
         this.getList();
@@ -292,7 +305,7 @@ export default {
     handleUpdate(index, row) {
       this.updateDilog = true;
       this.updateOptions = row;
-      this.updateOptions.type = row.type + "";
+      this.updateOptions.type = row.type + '';
     },
     handleUpdateItem(index, row) {
       this.$router.push({ path: "/sms/updateLottery", query: { id: row.id } });
@@ -345,6 +358,18 @@ export default {
         this.list = response.data;
         this.total = response.data.total;
       });
+    },
+    getCouponList() {
+      const params ={
+        pageSize: 1000,
+        pageNum: 1
+      }
+      getCouponList(params)
+        .then(({data}) => {
+          this.couponList = data.list || [];
+        })
+        .catch(err => {
+        })
     }
   }
 };
