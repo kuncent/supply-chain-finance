@@ -44,7 +44,7 @@ export default {
         dir: "",
         host: ""
       },
-      multiple:true,
+      multiple: true,
       dialogVisible: false,
       dialogImageUrl: null,
       useOss: true, //使用oss->true;使用MinIO->false
@@ -99,14 +99,29 @@ export default {
           });
       });
     },
-    handleUploadSuccess(res, file) {
-      let url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
-      if (!this.useOss) {
-        //不使用oss直接获取图片路径
-        url = res.data.url;
-      }
-      this.fileList.push({ name: file.name, url: url });
+    handleUploadSuccess(res, file,fileList) {
+      let files = [];
+      fileList.forEach(file => {
+        let url = file.url;
+        if (file.name) {
+          url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+          if (!this.useOss) {
+            //不使用oss直接获取图片路径
+            url = res.data.url;
+          }
+          files.push({ name: file.name, url: url });
+        }
+      });
+      this.fileList.push(...files);
       this.emitInput(this.fileList);
+
+      // let url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+      // if (!this.useOss) {
+      //   //不使用oss直接获取图片路径
+      //   url = res.data.url;
+      // }
+      // this.fileList.push({ name: file.name, url: url });
+      // this.emitInput(this.fileList);
     },
     handleExceed(files, fileList) {
       this.$message({

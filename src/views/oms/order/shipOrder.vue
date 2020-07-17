@@ -179,10 +179,11 @@ export default {
   created() {
     var now = new Date();
     var start = new Date(0, 0, 0, 0, 0, 0, 0);
-    console.log(start);
-    var millis = now - start - 3600 * 1000 * 2.1;
-    var twoHoursAgo = new Date(0, 0, 0, 0, 0, 0, millis);
-    this.createTime = [twoHoursAgo, now];
+    var millisSepcil = now - start - 3600 * 1000 * 2.1;
+    var millis = now - start - 3600 * 1000 * 24 * 7 - 360*1000;
+    var weekHoursAgo = new Date(0, 0, 0, 0, 0, 0, millis);
+    var twoHoursAgo = new Date(0, 0, 0, 0, 0, 0, millisSepcil);
+    this.createTime = [weekHoursAgo, twoHoursAgo];
     this.getList();
   },
   filters: {
