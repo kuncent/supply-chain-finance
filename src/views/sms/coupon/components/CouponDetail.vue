@@ -14,6 +14,10 @@
       <el-form-item label="优惠券名称：" prop="name">
         <el-input v-model="coupon.name" class="input-width"></el-input>
       </el-form-item>
+      <el-form-item label="优惠券类型：" prop="name">
+          <el-radio v-model="coupon.flag" label="-1">不限制</el-radio>
+          <el-radio v-model="coupon.flag" label="0">下1单后必中</el-radio>
+      </el-form-item>
       <el-form-item label="适用平台：">
         <el-select v-model="coupon.platform">
           <el-option
@@ -183,6 +187,7 @@ const defaultCoupon = {
   minPoint: null,
   startTime: null,
   endTime: null,
+  flag:'-1',
   useType: 0,
   note: null,
   publishCount: null,

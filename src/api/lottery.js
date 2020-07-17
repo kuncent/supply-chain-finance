@@ -73,10 +73,10 @@ export function lotteryUpdate(data) {
   })
 }
 
-export function lotteryUpdateItem(params) {
+export function lotteryUpdateItem(data) {
   return request({
     url: '/luckdraw/updateItem',
     method: 'post',
-    params: params
+    data: data
   })
 }

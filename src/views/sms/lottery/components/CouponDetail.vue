@@ -78,6 +78,11 @@
           <br />
           <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
         </el-form-item>
+        <el-form-item label="优惠券：">
+          <el-radio v-model="updateOptions.flag" label="-1">优惠券</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.flag" label="0">积分</el-radio>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="createOptions.showDilog = false">取 消</el-button>
@@ -108,9 +113,14 @@
           <br />
           <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
         </el-form-item>
+        <el-form-item label="优惠券：">
+          <el-radio v-model="updateOptions.flag" label="-1">优惠券</el-radio>
+          <br />
+          <el-radio v-model="updateOptions.type" label="0">积分</el-radio>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="createOptions.showDilog = false">取 消</el-button>
+        <el-button @click="updateDilog = false">取 消</el-button>
         <el-button type="primary" @click="handleUpdatefirm">确 定</el-button>
       </span>
     </el-dialog>
@@ -158,15 +168,18 @@ const defaultTypeOptions = [
 ];
 const defaultCreateOptions = {
   showDilog: false,
-  awardId: 0,
-  awardTotal: 0,
-  couponId: 0,
-  defineId: 0,
-  imgUrl: "",
+  awardId: null,
+  awardTotal: -1,
+  couponId: 24,
+  couponName: "",
+  defineId: 1,
+  id: 2,
+  imgUrl: null,
   itemName: "",
-  luckRatio: 0,
-  points: 0,
-  type: '0'
+  luckRatio: 10000,
+  points: null,
+  type: "0",
+  flag: "-1"
 };
 export default {
   name: "couponList",
@@ -249,8 +262,6 @@ export default {
   },
   methods: {
     handleCreateConfirm() {
-      console.log(this.createOptions);
-      this.createOptions.type = Number(this.createOptions.type)
       lotteryCreateItem(this.createOptions).then(response => {
         this.createOptions.showDilog = false;
         this.getList();
@@ -281,7 +292,7 @@ export default {
     handleUpdate(index, row) {
       this.updateDilog = true;
       this.updateOptions = row;
-      this.updateOptions.type = row.type + '';
+      this.updateOptions.type = row.type + "";
     },
     handleUpdateItem(index, row) {
       this.$router.push({ path: "/sms/updateLottery", query: { id: row.id } });

@@ -58,10 +58,10 @@
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="openId" align="center">
-          <template slot-scope="scope">{{scope.row.nickname}}</template>
+          <template slot-scope="scope">{{scope.row.username}}</template>
         </el-table-column>
         <el-table-column label="昵称" align="center">
-          <template slot-scope="scope">{{scope.row.username}}</template>
+          <template slot-scope="scope">{{scope.row.nickname}}</template>
         </el-table-column>
         <el-table-column label="手机号" align="center">
           <template slot-scope="scope">{{scope.row.phone}}</template>
