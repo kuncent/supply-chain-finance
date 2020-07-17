@@ -232,7 +232,12 @@
           <el-input v-model="refundQuery.note" class="input-width" placeholder="备注说明"></el-input>
         </el-form-item>
         <el-form-item label="当前账号密码：">
-          <el-input v-model="refundQuery.password" class="input-width" placeholder="当前账号密码：" type="password"></el-input>
+          <el-input
+            v-model="refundQuery.password"
+            class="input-width"
+            placeholder="当前账号密码："
+            type="password"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -241,13 +246,28 @@
       </span>
     </el-dialog>
     <el-dialog title="发送通知" :visible.sync="isSendMsgConfim" width="30%">
-      <span>发送子订单【{{childOrder}}】通知</span>
-      <br />
-      <el-radio v-model="type" label="1">订单配送通知</el-radio>
-      <br />
-      <el-radio v-model="type" label="2">订单签收通知</el-radio>
-      <br />
-      <el-radio v-model="type" label="3">退款成功通知</el-radio>
+      <span style="margin-left: 30px">发送子订单【{{childOrder}}】通知</span>
+      <el-form :inline="true" :model="sendMsgOptions" size="small" label-width="100px">
+        <el-form-item label="发送类型: ">
+          <el-radio v-model="sendMsgOptions.type" label="1">订单配送通知</el-radio>
+          <br />
+          <el-radio v-model="sendMsgOptions.type" label="2">订单签收通知</el-radio>
+          <br />
+          <el-radio v-model="sendMsgOptions.type" label="3">退款成功通知</el-radio>
+        </el-form-item>
+        <el-form-item label="配送人: ">
+          <el-input placeholder v-model="sendMsgOptions.deliveryName"></el-input>
+        </el-form-item>
+        <el-form-item label="配送员电话: ">
+          <el-input placeholder v-model="sendMsgOptions.deliveryMobile"></el-input>
+        </el-form-item>
+        <el-form-item label="签收时间: ">
+          <el-input placeholder v-model="sendMsgOptions.receiveTime"></el-input>
+        </el-form-item>
+        <el-form-item label="签收人: ">
+          <el-input placeholder v-model="sendMsgOptions.receiveName"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isSendMsgConfim = false">取 消</el-button>
         <el-button type="primary" @click="sendMsg">确 定</el-button>
@@ -281,12 +301,21 @@ const defaultListQuery = {
   status: "",
   nicknameSearch: ""
 };
+const defaultSendMsgOptions = {
+  id: null,
+  type: "1",
+  deliveryName: null,
+  deliveryMobile: null,
+  receiveTime: null,
+  receiveName: null
+};
 export default {
   name: "childOrder",
   components: { LogisticsDialog },
   data() {
     return {
       listQuery: Object.assign({}, defaultListQuery),
+      sendMsgOptions: Object.assign({}, defaultSendMsgOptions),
       listLoading: true,
       list: null,
       total: null,
@@ -382,7 +411,7 @@ export default {
       refundQuery: {
         password: "",
         remarks: "",
-        id:""
+        id: ""
       },
       type: "1"
     };
@@ -435,9 +464,7 @@ export default {
     },
     refundConfim() {
       this.refundQuery.id = this.refundId;
-      fetcRefund(this.refundQuery).then(response => {
-
-      });
+      fetcRefund(this.refundQuery).then(response => {});
       this.isRefundConfim = false;
     },
     handleResetSearch() {
@@ -471,13 +498,14 @@ export default {
       this.childOrder = row.id;
     },
     sendMsg() {
-      sendMsg({ id: this.childOrder, type: this.type }).then(response => {
+      this.sendMsgOptions.id = this.childOrder;
+      sendMsg(this.sendMsgOptions).then(response => {
         if (response.code === 200) {
           this.isSendMsgConfim = false;
-          // this.$message({
-          //   message: "发送成功",
-          //   type: "success"
-          // });
+          this.$message({
+            message: "推送成功",
+            type: "success"
+          });
         }
       });
     },

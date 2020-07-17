@@ -59,8 +59,8 @@
         <el-form-item label="奖品名称: ">
           <el-input placeholder v-model="createOptions.itemName"></el-input>
         </el-form-item>
-        <el-form-item label="概率: ">
-          <el-input placeholder v-model="createOptions.luckRatio"></el-input>
+        <el-form-item label="概率(%): ">
+          <el-input placeholder v-model="createOptions.luckRatio">%</el-input>
         </el-form-item>
         <el-form-item label="图片: ">
           <single-upload
@@ -72,14 +72,14 @@
           <el-input placeholder v-model="createOptions.awardTotal"></el-input>
         </el-form-item>
         <el-form-item label="奖品类型：">
-          <el-radio v-model="updateOptions.type" label="0">优惠券</el-radio>
+          <el-radio v-model="createOptions.type" label="0">优惠券</el-radio>
           <br />
-          <el-radio v-model="updateOptions.type" label="1">积分</el-radio>
+          <el-radio v-model="createOptions.type" label="1">积分</el-radio>
           <br />
-          <el-radio v-model="updateOptions.type" label="2">赠品</el-radio>
+          <el-radio v-model="createOptions.type" label="2">赠品</el-radio>
         </el-form-item>
-        <el-form-item label="优惠券" v-if="updateOptions.type==0">
-          <el-select v-model="updateOptions.couponId" placeholder="请选择">
+        <el-form-item label="优惠券" v-if="createOptions.type==0">
+          <el-select v-model="createOptions.couponId" placeholder="请选择">
             <el-option
               v-for="item in couponList"
               :key="item.id"
@@ -99,7 +99,7 @@
         <el-form-item label="奖品名称: ">
           <el-input placeholder v-model="updateOptions.itemName"></el-input>
         </el-form-item>
-        <el-form-item label="概率: ">
+        <el-form-item label="概率(%): ">
           <el-input placeholder v-model="updateOptions.luckRatio"></el-input>
         </el-form-item>
         <el-form-item label="图片: ">
@@ -227,8 +227,8 @@ export default {
     };
   },
   created() {
-    console.log(this.$router);
     this.id = this.$route.query.id;
+    this.createOptions.defineId = this.id;
     this.getList();
     this.getCouponList();
   },
@@ -273,14 +273,14 @@ export default {
   },
   methods: {
     handleCreateConfirm() {
-      console.log(this.createOptions);
-      this.createOptions.type = Number(this.createOptions.type)
+      this.createOptions.luckRatio = this.createOptions.luckRatio*100;
       lotteryCreateItem(this.createOptions).then(response => {
         this.createOptions.showDilog = false;
         this.getList();
       });
     },
     handleUpdatefirm() {
+      this.updateOptions.luckRatio = this.updateOptions.luckRatio*100;
       lotteryUpdateItem(this.updateOptions).then(response => {
         this.updateDilog = false;
         this.getList();
@@ -305,7 +305,6 @@ export default {
     handleUpdate(index, row) {
       this.updateDilog = true;
       this.updateOptions = row;
-      this.updateOptions.type = row.type + '';
     },
     handleUpdateItem(index, row) {
       this.$router.push({ path: "/sms/updateLottery", query: { id: row.id } });
@@ -334,6 +333,7 @@ export default {
       this.getList();
     },
     handleAdd() {
+      this.createOptions.luckRatio = 0;
       this.createOptions.showDilog = true;
     },
     handleDelete(index, row) {
@@ -356,6 +356,9 @@ export default {
       lotteryListItem({ defineId: this.id }).then(response => {
         this.listLoading = false;
         this.list = response.data;
+        this.list.forEach(element => {
+          element.luckRatio = element.luckRatio/100
+        });
         this.total = response.data.total;
       });
     },

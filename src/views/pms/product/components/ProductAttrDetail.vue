@@ -135,6 +135,9 @@
           </div>
         </el-card>
       </el-form-item>
+      <el-form-item label="商品主图：">
+        <single-multi-upload v-model="selectPics"></single-multi-upload>
+      </el-form-item>
       <el-form-item label="商品相册：">
         <multi-upload v-model="selectProductPics"></multi-upload>
       </el-form-item>
@@ -163,12 +166,13 @@
 import { fetchList as fetchProductAttrCateList } from "@/api/productAttrCate";
 import { fetchList as fetchProductAttrList } from "@/api/productAttr";
 import SingleUpload from "@/components/Upload/singleUpload";
+import SingleMultiUpload from "@/components/Upload/singleMultiUpload";
 import MultiUpload from "@/components/Upload/multiUpload";
 import Tinymce from "@/components/Tinymce";
 
 export default {
   name: "ProductAttrDetail",
-  components: { SingleUpload, MultiUpload, Tinymce },
+  components: { SingleUpload, MultiUpload, SingleMultiUpload, Tinymce },
   props: {
     value: Object,
     isEdit: {
@@ -206,10 +210,8 @@ export default {
     productId() {
       return this.value.id;
     },
-    //商品的主图
-    selectProductPics: {
+    selectPics: {
       get: function() {
-        console.log("1get", this.value);
         let pics = [];
         if (
           this.value.pic === undefined ||
@@ -219,6 +221,20 @@ export default {
           return pics;
         }
         pics.push(this.value.pic);
+        return pics;
+      },
+      set: function(newValue) {
+        if (newValue == null || newValue.length === 0) {
+          this.value.pic = null;
+        } else {
+          this.value.pic = newValue[0];
+        }
+      }
+    },
+    //商品的主图
+    selectProductPics: {
+      get: function() {
+        let pics = [];
         if (
           this.value.albumPics === undefined ||
           this.value.albumPics == null ||
@@ -233,19 +249,14 @@ export default {
         return pics;
       },
       set: function(newValue) {
-        console.log("1set", newValue);
         if (newValue == null || newValue.length === 0) {
-          this.value.pic = null;
           this.value.albumPics = null;
         } else {
-          this.value.pic = newValue[0];
           this.value.albumPics = "";
-          if (newValue.length > 1) {
-            for (let i = 1; i < newValue.length; i++) {
-              this.value.albumPics += newValue[i];
-              if (i !== newValue.length - 1) {
-                this.value.albumPics += ",";
-              }
+          for (let i = 0; i < newValue.length; i++) {
+            this.value.albumPics += newValue[i];
+            if (i !== newValue.length - 1) {
+              this.value.albumPics += ",";
             }
           }
         }
@@ -254,7 +265,6 @@ export default {
     //商品详情图
     selectProducDetailtPics: {
       get: function() {
-        console.log("2get", this.value);
         let pics = [];
         if (
           this.value.detailPics === undefined ||
@@ -270,7 +280,6 @@ export default {
         return pics;
       },
       set: function(newValue) {
-        console.log("2set", newValue);
         if (newValue == null || newValue.length === 0) {
           this.value.detailPics = null;
         } else {

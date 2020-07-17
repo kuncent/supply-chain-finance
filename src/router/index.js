@@ -330,6 +330,21 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/statistics',
+    component: Layout,
+    redirect: '/statistics/daily',
+    name: 'cms',
+    meta: { title: '日报统计', icon: 'oms' },
+    children: [
+      {
+        path: 'daily',
+        name: 'daily',
+        component: () => import('@/views/statistics/daily/daily'),
+        meta: { title: '用户列表', icon: 'ums-role' }
+      },
+    ]
+  },
+  {
     path: '/ums',
     component: Layout,
     redirect: '/ums/admin',

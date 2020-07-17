@@ -11,7 +11,6 @@
       :on-preview="handlePreview"
       :limit="maxCount"
       :on-exceed="handleExceed"
-      :multiple="multiple"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -24,14 +23,14 @@
 import { policy } from "@/api/oss";
 
 export default {
-  name: "multiUpload",
+  name: "singleMultiUpload",
   props: {
     //图片属性数组
     value: Array,
     //最大上传图片数量
     maxCount: {
       type: Number,
-      default: 30
+      default: 1
     }
   },
   data() {
@@ -44,7 +43,6 @@ export default {
         dir: "",
         host: ""
       },
-      multiple:true,
       dialogVisible: false,
       dialogImageUrl: null,
       useOss: true, //使用oss->true;使用MinIO->false
