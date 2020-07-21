@@ -57,6 +57,16 @@
               ></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="退款状态：">
+            <el-select v-model="listQuery.returnStatus" class="input-width" placeholder="全部" clearable>
+              <el-option
+                v-for="item in returnStatusOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
       </div>
     </el-card>
@@ -89,7 +99,7 @@
         <el-table-column label="退款状态" width="120" align="center">
           <template slot-scope="scope">{{returnStatusTips[scope.row.returnStatus] || ''}}</template>
         </el-table-column>
-        <el-table-column label="用户Id" align="center">
+        <el-table-column label="Id" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="用户昵称" align="center">
@@ -102,10 +112,10 @@
           <template slot-scope="scope">{{scope.row.productId}}</template>
         </el-table-column>
         <el-table-column label="商品货号" align="center">
-          <template slot-scope="scope">{{scope.row.productSn}}</template>
-        </el-table-column>
-        <el-table-column label="sku编号" align="center">
           <template slot-scope="scope">{{scope.row.productSkuCode}}</template>
+        </el-table-column>
+        <el-table-column label="skuId" align="center">
+          <template slot-scope="scope">{{scope.row.productSkuId}}</template>
         </el-table-column>
         <el-table-column label="规格" align="center">
           <template slot-scope="scope">{{scope.row.productAttrShow}}</template>
@@ -126,7 +136,7 @@
           <template slot-scope="scope">{{scope.row.shopName}}</template>
         </el-table-column>
         <el-table-column label="商品分类" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.productCategoryId}}</template>
+          <template slot-scope="scope">{{scope.row.productCategoryName}}</template>
         </el-table-column>
         <el-table-column label="付款时间" width="120" align="center">
           <template slot-scope="scope">{{scope.row.paymentTime}}</template>
@@ -299,7 +309,8 @@ const defaultListQuery = {
   createTimeGe: null,
   deliveryTimeGe: null,
   status: "",
-  nicknameSearch: ""
+  nicknameSearch: "",
+  returnStatus:""
 };
 const defaultSendMsgOptions = {
   id: null,
@@ -365,6 +376,24 @@ export default {
         {
           label: "已关闭",
           value: 4
+        }
+      ],
+      returnStatusOptions:[
+        {
+          label: "未退款",
+          value: -1
+        },
+        {
+          label: "退款中",
+          value: 0
+        },
+        {
+          label: "退款成功",
+          value: 1
+        },
+        {
+          label: "退款失败",
+          value: 2
         }
       ],
       orderTypeOptions: [

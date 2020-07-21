@@ -18,6 +18,10 @@
           <el-radio v-model="coupon.flag" label="-1">不限制</el-radio>
           <el-radio v-model="coupon.flag" label="0">下1单后必中</el-radio>
       </el-form-item>
+      <!-- <el-form-item label="是否有效：" prop="name">
+          <el-radio v-model="coupon.status" label="0">有效</el-radio>
+          <el-radio v-model="coupon.status" label="1">失效</el-radio>
+      </el-form-item> -->
       <el-form-item label="适用平台：">
         <el-select v-model="coupon.platform">
           <el-option
@@ -28,19 +32,19 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="总发行量：" prop="publishCount">
+      <!-- <el-form-item label="总发行量：" prop="publishCount">
         <el-input v-model.number="coupon.publishCount" placeholder="只能输入正整数" class="input-width"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="面额：" prop="amount">
         <el-input v-model.number="coupon.amount" placeholder="面值只能是数值，限2位小数" class="input-width">
           <template slot="append">元</template>
         </el-input>
       </el-form-item>
-      <el-form-item label="每人限领：">
+      <!-- <el-form-item label="每人限领：">
         <el-input v-model="coupon.perLimit" placeholder="只能输入正整数" class="input-width">
           <template slot="append">张</template>
         </el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="使用门槛：" prop="minPoint">
         <el-input v-model.number="coupon.minPoint" placeholder="只能输入正整数" class="input-width">
           <template slot="prepend">满</template>
@@ -48,7 +52,7 @@
         </el-input>
       </el-form-item>
       <el-form-item label="有效期：">
-        <el-date-picker
+        <!-- <el-date-picker
           type="date"
           placeholder="选择日期"
           v-model="coupon.startTime"
@@ -60,8 +64,7 @@
           placeholder="选择日期"
           v-model="coupon.endTime"
           style="width: 150px"
-        ></el-date-picker>
-        <br />
+        ></el-date-picker> -->
         <div class="padding10">
           <el-radio v-model="coupon.dateCouponType" label="0">
             领券当日起
@@ -183,14 +186,15 @@ const defaultCoupon = {
   name: null,
   platform: 0,
   amount: null,
-  perLimit: 1,
+  perLimit: 0,
   minPoint: null,
   startTime: null,
   endTime: null,
   flag:'-1',
   useType: 0,
+  status:'0',
   note: null,
-  publishCount: null,
+  publishCount: 0,
   productRelationList: [],
   productCategoryRelationList: []
 };
@@ -282,7 +286,6 @@ export default {
     };
   },
   created() {
-    console.log(this.$router)
     if (this.isEdit) {
       getCoupon(this.$route.query.id).then(response => {
         this.coupon = response.data;

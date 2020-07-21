@@ -180,7 +180,7 @@ export default {
     var now = new Date();
     var start = new Date(0, 0, 0, 0, 0, 0, 0);
     var millisSepcil = now - start - 3600 * 1000 * 2.1;
-    var millis = now - start - 3600 * 1000 * 24 * 7 - 360*1000;
+    var millis = now - start - 3600 * 1000 * 24 * 7 - 360 * 1000;
     var weekHoursAgo = new Date(0, 0, 0, 0, 0, 0, millis);
     var twoHoursAgo = new Date(0, 0, 0, 0, 0, 0, millisSepcil);
     this.createTime = [weekHoursAgo, twoHoursAgo];
@@ -194,9 +194,7 @@ export default {
     }
   },
   methods: {
-    handleIsExport(){
-
-    },
+    handleIsExport() {},
     handleChange(file, fileList) {
       this.fileList = fileList.slice(-3);
     },
@@ -272,20 +270,20 @@ export default {
     },
     exportUnshippedOrderItem() {
       const createTime = this.createTime;
-      this.listQuery.createTimeGe = formatDate(
-        createTime[0],
-        "yyyy-MM-dd hh:mm:ss"
-      );
-      this.listQuery.createTimeLe = formatDate(
-        createTime[1],
-        "yyyy-MM-dd hh:mm:ss"
-      );
+      if (createTime) {
+        this.listQuery.createTimeGe = formatDate(
+          createTime[0],
+          "yyyy-MM-dd hh:mm:ss"
+        );
+        this.listQuery.createTimeLe = formatDate(
+          createTime[1],
+          "yyyy-MM-dd hh:mm:ss"
+        );
+      }
       console.log(this.listQuery);
       exportUnshippedOrderItem(this.listQuery).then(response => {
-        console.log(response);
         const fileKey = response.data.fileKey;
-        window.location.href =
-          process.env.BASE_API + "/localFile/download?fileKey=" + fileKey;
+        window.location.href = fileKey;
       });
     },
     uploadFile() {

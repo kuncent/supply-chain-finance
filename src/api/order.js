@@ -67,7 +67,7 @@ export function updateOrderNote(params) {
 export function exportUnshippedOrderItem(params) {
   return request({
     url: '/orderItem/exportUnshippedOrderItem',
-    method: 'post',
+    method: 'get',
     params: params
   })
 }

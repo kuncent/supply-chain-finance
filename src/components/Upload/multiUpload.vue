@@ -49,7 +49,9 @@ export default {
       dialogImageUrl: null,
       useOss: true, //使用oss->true;使用MinIO->false
       ossUploadUrl: "http://mty-youquan.oss-cn-shenzhen.aliyuncs.com",
-      minioUploadUrl: "http://localhost:8080/minio/upload"
+      minioUploadUrl: "http://localhost:8080/minio/upload",
+      imgId: 0,
+      imgList: []
     };
   },
   computed: {
@@ -77,20 +79,33 @@ export default {
       this.dialogImageUrl = file.url;
     },
     beforeUpload(file) {
+      console.log(file);
       let _self = this;
       if (!this.useOss) {
         //不使用oss不需要获取策略
         return true;
       }
+      var len = 32;
+      var chars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
+      var maxPos = chars.length;
+      var key = "";
+      for (var i = 0; i < len; i++) {
+        key += chars.charAt(Math.floor(Math.random() * maxPos));
+      }
+      this.key = key;
       return new Promise((resolve, reject) => {
         policy()
           .then(response => {
             _self.dataObj.policy = response.data.policy;
             _self.dataObj.signature = response.data.signature;
             _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-            _self.dataObj.key = response.data.dir + "/${filename}";
-            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.key = response.data.key;
+            _self.dataObj.dir = response.data.key.slice(0, 21);
             _self.dataObj.host = response.data.host;
+            this.imgList.push({
+              uid: file.uid,
+              key: response.data.key
+            });
             resolve(true);
           })
           .catch(err => {
@@ -99,12 +114,16 @@ export default {
           });
       });
     },
-    handleUploadSuccess(res, file,fileList) {
+    handleUploadSuccess(res, file, fileList) {
       let files = [];
       fileList.forEach(file => {
         let url = file.url;
         if (file.name) {
-          url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+          this.imgList.forEach(item => {
+            if (item.uid === file.uid) {
+              url = this.dataObj.host + "/" + item.key;
+            }
+          });
           if (!this.useOss) {
             //不使用oss直接获取图片路径
             url = res.data.url;
