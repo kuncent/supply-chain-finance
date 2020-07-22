@@ -73,6 +73,7 @@
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
       <span>数据列表</span>
+      <el-button type="primary" style="float:right;margin-top:-8px" size="small" @click="exportList">导出订单列表</el-button>
     </el-card>
     <div class="table-container">
       <el-table
@@ -294,7 +295,8 @@ import {
   exportUnshippedOrderItem,
   viewDelivery,
   fetcRefund,
-  sendMsg
+  sendMsg,
+  exportList
 } from "@/api/order";
 import { formatDate } from "@/utils/date";
 import LogisticsDialog from "@/views/oms/order/components/logisticsDialog";
@@ -525,6 +527,13 @@ export default {
     handleSendMsg(index, row) {
       this.isSendMsgConfim = true;
       this.childOrder = row.id;
+    },
+    exportList(){
+      exportList(this.listQuery).then(response=>{
+        if(response.code === 200){
+          window.location.href = response.data.fileKey;
+        }
+      })
     },
     sendMsg() {
       this.sendMsgOptions.id = this.childOrder;

@@ -112,6 +112,14 @@ export function sendMsg(params) {
   })
 }
 
+export function exportList(params) {
+  return request({
+    url: '/orderItem/exportList',
+    method: 'get',
+    params: params
+  })
+}
+
 export function viewDelivery(id) {
   return request({
     url: '/orderItem/logistics?id='+id,
