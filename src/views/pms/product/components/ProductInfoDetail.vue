@@ -17,6 +17,9 @@
       <el-form-item label="副标题：" prop="subTitle">
         <el-input v-model="value.subTitle"></el-input>
       </el-form-item>
+      <el-form-item label="标签标题：" prop="subTitle">
+        <el-input v-model="value.priceTitle"></el-input>
+      </el-form-item>
       <el-form-item label="商品品牌：" prop="brandId">
         <el-select v-model="value.brandId" @change="handleBrandChange" placeholder="请选择品牌">
           <el-option

@@ -138,6 +138,24 @@
       <el-form-item label="商品主图：">
         <single-multi-upload v-model="selectPics"></single-multi-upload>
       </el-form-item>
+      <el-form-item label="视频主图：">
+        <single-multi-upload v-model="vedioPics"></single-multi-upload>
+      </el-form-item>
+      <el-form-item label="视频主图：">
+        <el-upload
+          style="display:inline-block"
+          action="http://mty-youquan.oss-cn-shenzhen.aliyuncs.com"
+          :data="dataObj"
+          :file-list="fileList"
+          :multiple="false"
+          :on-change="handleChange"
+          :on-success="handleSuccess"
+          :before-upload="beforeUpload"
+          :limit="1"
+        >
+          <el-button size="small" type="primary">导入商品视频</el-button>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="商品相册：">
         <multi-upload v-model="selectProductPics"></multi-upload>
       </el-form-item>
@@ -195,7 +213,17 @@ export default {
       //可手动添加的商品属性
       addProductAttrValue: "",
       //商品富文本详情激活类型
-      activeHtmlName: "pc"
+      activeHtmlName: "pc",
+      fileList: [],
+      dataObj: {
+        policy: "",
+        signature: "",
+        key: "",
+        ossaccessKeyId: "",
+        dir: "",
+        host: ""
+      },
+      listObj: {}
     };
   },
   computed: {
@@ -209,6 +237,27 @@ export default {
     //商品的编号
     productId() {
       return this.value.id;
+    },
+    vedioPics: {
+      get: function() {
+        let pics = [];
+        if (
+          this.value.videoImg === undefined ||
+          this.value.videoImg == null ||
+          this.value.videoImg === ""
+        ) {
+          return pics;
+        }
+        pics.push(this.value.videoImg);
+        return pics;
+      },
+      set: function(newValue) {
+        if (newValue == null || newValue.length === 0) {
+          this.value.videoImg = null;
+        } else {
+          this.value.videoImg = newValue[0];
+        }
+      }
     },
     selectPics: {
       get: function() {
@@ -306,6 +355,39 @@ export default {
     }
   },
   methods: {
+    handleChange(file, fileList) {
+      this.fileList = fileList.slice(-3);
+    },
+    handleSuccess(response, file) {
+      const url = this.dataObj.host + "/" + this.dataObj.key;
+    },
+    beforeUpload(file) {
+      const _self = this;
+      const fileName = file.uid;
+      this.listObj[fileName] = {};
+      return new Promise((resolve, reject) => {
+        policy()
+          .then(response => {
+            _self.dataObj.policy = response.data.policy;
+            _self.dataObj.signature = response.data.signature;
+            _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
+            _self.dataObj.key = response.data.key;
+            _self.dataObj.dir = response.data.key.slice(0, 21);
+            _self.dataObj.host = response.data.host;
+            _self.listObj[fileName] = {
+              hasSuccess: false,
+              uid: file.uid,
+              width: this.width,
+              height: this.height
+            };
+            resolve(true);
+          })
+          .catch(err => {
+            console.log(err);
+            reject(false);
+          });
+      });
+    },
     handleEditCreated() {
       //根据商品属性分类id获取属性和参数
       if (this.value.productAttributeCategoryId != null) {

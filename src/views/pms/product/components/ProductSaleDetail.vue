@@ -1,7 +1,7 @@
 <template>
   <div style="margin-top: 50px">
     <el-form :model="value" ref="productSaleForm" label-width="120px" style="width: 600px" size="small">
-      <el-form-item label="赠送积分：">
+      <!-- <el-form-item label="赠送积分：">
         <el-input v-model="value.giftPoint"></el-input>
       </el-form-item>
       <el-form-item label="赠送成长值：">
@@ -16,6 +16,9 @@
           :active-value="1"
           :inactive-value="0">
         </el-switch>
+      </el-form-item> -->
+      <el-form-item label="基础销量：">
+        <el-input v-model="value.baseSales"></el-input>
       </el-form-item>
       <el-form-item label="商品上架：">
         <el-switch
