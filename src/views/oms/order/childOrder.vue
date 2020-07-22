@@ -130,7 +130,7 @@
           <template slot-scope="scope">{{scope.row.costPrice}}</template>
         </el-table-column>
         <el-table-column label="付款金额" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.totalAmount}}</template>
+          <template slot-scope="scope">{{scope.row.realAmount}}</template>
         </el-table-column>
         <el-table-column label="所属店铺" width="120" align="center">
           <template slot-scope="scope">{{scope.row.shopName}}</template>
@@ -139,10 +139,10 @@
           <template slot-scope="scope">{{scope.row.productCategoryName}}</template>
         </el-table-column>
         <el-table-column label="付款时间" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.paymentTime}}</template>
+          <template slot-scope="scope">{{scope.row.paymentTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="发货时间" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.deliveryTime}}</template>
+          <template slot-scope="scope">{{scope.row.deliveryTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="收货人" width="120" align="center">
           <template slot-scope="scope">{{scope.row.receiverName}}</template>
@@ -450,6 +450,7 @@ export default {
   },
   filters: {
     formatCreateTime(time) {
+      if(!time) return
       let date = new Date(time);
       return formatDate(date, "yyyy-MM-dd hh:mm:ss");
     },
@@ -519,7 +520,6 @@ export default {
         const list = response.data.list;
         this.viewDeliveryDilog = true;
         this.deliveryList = list;
-        console.log(this.deliveryList);
       });
     },
     handleSendMsg(index, row) {

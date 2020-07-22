@@ -75,7 +75,7 @@
           <template slot-scope="scope">{{scope.row.giftAmount}}</template>
         </el-table-column>
         <el-table-column label="注册时间" align="center">
-          <template slot-scope="scope">{{scope.row.createTime}}</template>
+          <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">

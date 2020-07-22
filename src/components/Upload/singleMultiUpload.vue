@@ -86,8 +86,9 @@ export default {
             _self.dataObj.policy = response.data.policy;
             _self.dataObj.signature = response.data.signature;
             _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-            _self.dataObj.key = response.data.dir + "/${filename}";
-            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.key = response.data.key;
+            // _self.dataObj.dir = response.data.dir;
+            _self.dataObj.dir = response.data.key.slice(0, 21);
             _self.dataObj.host = response.data.host;
             resolve(true);
           })
@@ -98,7 +99,7 @@ export default {
       });
     },
     handleUploadSuccess(res, file) {
-      let url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+      let url = this.dataObj.host + '/' + this.dataObj.key;
       if (!this.useOss) {
         //不使用oss直接获取图片路径
         url = res.data.url;

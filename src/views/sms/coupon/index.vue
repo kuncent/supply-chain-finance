@@ -68,12 +68,12 @@
         <el-table-column label="适用平台" width="100" align="center">
           <template slot-scope="scope">{{scope.row.platform | formatPlatform}}</template>
         </el-table-column>
-        <el-table-column label="有效期" width="180" align="center">
+        <!-- <el-table-column label="有效期" width="180" align="center">
           <template slot-scope="scope">{{scope.row.startTime|formatDate}}至{{scope.row.endTime|formatDate}}</template>
         </el-table-column>
         <el-table-column label="状态" width="100" align="center">
           <template slot-scope="scope">{{scope.row.endTime | formatStatus}}</template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
             <el-button size="mini"

@@ -49,7 +49,7 @@
     <div class="table-container">
       <el-table ref="orderTable" :data="list" style="width: 100%;" v-loading="listLoading" border>
         <el-table-column label="操作时间" align="center">
-          <template slot-scope="scope">{{scope.row.createTime}}</template>
+          <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="操作人" align="center">
           <template slot-scope="scope">{{scope.row.username}}</template>
@@ -189,7 +189,6 @@ export default {
   filters: {
     formatCreateTime(time) {
       let date = new Date(time);
-      console.log(formatDate(date, "yyyy-MM-dd hh:mm:ss"));
       return formatDate(date, "yyyy-MM-dd hh:mm:ss");
     }
   },
@@ -199,7 +198,7 @@ export default {
       this.fileList = fileList.slice(-3);
     },
     handleSuccess(response, file) {
-      const url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+      const url = this.dataObj.host + "/" + this.dataObj.key;
       importShippingByUrl({ url }).then(response => {
         if (response.code === 200) {
           this.uploadSuccOptions = response.data;
@@ -218,8 +217,8 @@ export default {
             _self.dataObj.policy = response.data.policy;
             _self.dataObj.signature = response.data.signature;
             _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-            _self.dataObj.key = response.data.dir + "/${filename}";
-            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.key = response.data.key;
+            _self.dataObj.dir = response.data.key.slice(0, 21);
             _self.dataObj.host = response.data.host;
             _self.listObj[fileName] = {
               hasSuccess: false,

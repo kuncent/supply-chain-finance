@@ -434,6 +434,13 @@ export default {
       fetchList(this.listQuery).then(response => {
         this.listLoading = false;
         this.list = response.data.list;
+        this.list.forEach(element => {
+          this.typeOptions.forEach(item => {
+            if (element.activityKey === item.value) {
+              element.activityKey = item.label;
+            }
+          });
+        });
         this.total = response.data.total;
       });
     }

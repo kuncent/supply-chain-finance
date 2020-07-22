@@ -63,7 +63,7 @@
           <template slot-scope="scope">{{scope.row.addCartUv}}</template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">
-          <template slot-scope="scope">{{scope.row.createTime}}</template>
+          <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
@@ -119,15 +119,16 @@ export default {
     };
   },
   created() {
-    this.listQuery.statDateGe = new Date();
-    this.listQuery.statDateLe = new Date();
+    this.listQuery.statDateGe = formatDate(new Date(),"yyyy-MM-dd");
+    this.listQuery.statDateLe = formatDate(new Date(),"yyyy-MM-dd");
     this.createTime = [new Date(), new Date()];
     this.getList();
   },
   filters: {
     formatCreateTime(time) {
+      if (!time) return
       let date = new Date(time);
-      return formatDate(date, "yyyy-MM-dd");
+      return formatDate(date, "yyyy-MM-dd hh:mm:ss");
     }
   },
   methods: {
@@ -216,7 +217,7 @@ export default {
         this.listLoading = false;
         this.list = response.data;
         this.list.forEach(element => {
-          element.statDate = formatDate(new Date(element.statDate),"yyyy-MM-dd:hh-mm-ss");
+          element.statDate = formatDate(new Date(element.statDate),"yyyy-MM-dd");
         });
         this.total = response.data.total;
       });
