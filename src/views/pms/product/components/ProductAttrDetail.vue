@@ -143,17 +143,16 @@
       </el-form-item>
       <el-form-item label="视频主图：">
         <el-upload
-          style="display:inline-block"
           action="http://mty-youquan.oss-cn-shenzhen.aliyuncs.com"
           :data="dataObj"
+          :on-change="handleChange"
           :file-list="fileList"
           :multiple="false"
-          :on-change="handleChange"
           :on-success="handleSuccess"
           :before-upload="beforeUpload"
           :limit="1"
         >
-          <el-button size="small" type="primary">导入商品视频</el-button>
+          <el-button size="small" type="primary">导入视频</el-button>
         </el-upload>
       </el-form-item>
       <el-form-item label="商品相册：">
@@ -187,6 +186,7 @@ import SingleUpload from "@/components/Upload/singleUpload";
 import SingleMultiUpload from "@/components/Upload/singleMultiUpload";
 import MultiUpload from "@/components/Upload/multiUpload";
 import Tinymce from "@/components/Tinymce";
+import { policy } from "@/api/oss";
 
 export default {
   name: "ProductAttrDetail",
@@ -360,19 +360,19 @@ export default {
     },
     handleSuccess(response, file) {
       const url = this.dataObj.host + "/" + this.dataObj.key;
+      this.row.videoUrl = url;
     },
     beforeUpload(file) {
+      console.log(333333)
       const _self = this;
       const fileName = file.uid;
       this.listObj[fileName] = {};
       return new Promise((resolve, reject) => {
-        policy()
-          .then(response => {
+        policy().then(response => {
             _self.dataObj.policy = response.data.policy;
             _self.dataObj.signature = response.data.signature;
             _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
             _self.dataObj.key = response.data.key;
-            _self.dataObj.dir = response.data.key.slice(0, 21);
             _self.dataObj.host = response.data.host;
             _self.listObj[fileName] = {
               hasSuccess: false,
