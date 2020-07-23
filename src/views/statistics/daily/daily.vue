@@ -47,8 +47,14 @@
         <el-table-column label="活跃用户UV" align="center">
           <template slot-scope="scope">{{scope.row.openAppUv}}</template>
         </el-table-column>
-        <el-table-column label="打开抽奖页面UV" align="center">
+        <el-table-column label="点击活动UV" align="center">
           <template slot-scope="scope">{{scope.row.openActivityUv}}</template>
+        </el-table-column>
+        <el-table-column label="点击抽奖UV" align="center">
+          <template slot-scope="scope">{{scope.row.openLuckdrawUv}}</template>
+        </el-table-column>
+        <el-table-column label="点击红包UV" align="center">
+          <template slot-scope="scope">{{scope.row.openRedbagUv}}</template>
         </el-table-column>
         <el-table-column label="优惠券弹窗点击UV" align="center">
           <template slot-scope="scope">{{scope.row.openPopcouponUv}}</template>
