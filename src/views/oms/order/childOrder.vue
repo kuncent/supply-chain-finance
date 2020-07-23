@@ -67,6 +67,13 @@
               ></el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="收货人电话：">
+            <el-input
+              v-model="listQuery.receiverPhone"
+              class="input-width"
+              placeholder="收货人电话"
+            ></el-input>
+          </el-form-item>
         </el-form>
       </div>
     </el-card>
@@ -100,8 +107,8 @@
         <el-table-column label="退款状态" width="120" align="center">
           <template slot-scope="scope">{{returnStatusTips[scope.row.returnStatus] || ''}}</template>
         </el-table-column>
-        <el-table-column label="Id" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="用户Id" align="center">
+          <template slot-scope="scope">{{scope.row.memberId}}</template>
         </el-table-column>
         <el-table-column label="用户昵称" align="center">
           <template slot-scope="scope">{{scope.row.nickname}}</template>
