@@ -93,6 +93,10 @@ export default {
         key += chars.charAt(Math.floor(Math.random() * maxPos));
       }
       this.key = key;
+      this.imgList.push({
+        uid: file.uid,
+        key: this.key
+      });
       return new Promise((resolve, reject) => {
         policy()
           .then(response => {
@@ -102,10 +106,7 @@ export default {
             _self.dataObj.key = response.data.key;
             _self.dataObj.dir = response.data.key.slice(0, 21);
             _self.dataObj.host = response.data.host;
-            this.imgList.push({
-              uid: file.uid,
-              key: response.data.key
-            });
+
             resolve(true);
           })
           .catch(err => {
