@@ -48,11 +48,14 @@ export default {
       dialogVisible: false,
       dialogImageUrl: null,
       useOss: true, //使用oss->true;使用MinIO->false
-      ossUploadUrl: "http://mty-youquan.oss-cn-shenzhen.aliyuncs.com",
+      ossUploadUrl: "/apiUpload",
       minioUploadUrl: "http://localhost:8080/minio/upload",
       imgId: 0,
       imgList: []
     };
+  },
+  created() {
+    this.nums = 0;
   },
   computed: {
     fileList() {
@@ -78,13 +81,15 @@ export default {
       this.dialogVisible = true;
       this.dialogImageUrl = file.url;
     },
-    beforeUpload(file) {
-      console.log(file);
+    async beforeUpload(file) {
+      this.isUpload = true;
+      // console.log(file);
       let _self = this;
       if (!this.useOss) {
         //不使用oss不需要获取策略
         return true;
       }
+      this.nums++;
       var len = 32;
       var chars = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
       var maxPos = chars.length;
@@ -93,29 +98,74 @@ export default {
         key += chars.charAt(Math.floor(Math.random() * maxPos));
       }
       this.key = key;
-      this.imgList.push({
-        uid: file.uid,
-        key: this.key
-      });
-      return new Promise((resolve, reject) => {
-        policy()
-          .then(response => {
-            _self.dataObj.policy = response.data.policy;
-            _self.dataObj.signature = response.data.signature;
-            _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
-            _self.dataObj.key = response.data.key;
-            _self.dataObj.dir = response.data.key.slice(0, 21);
-            _self.dataObj.host = response.data.host;
 
-            resolve(true);
-          })
-          .catch(err => {
-            console.log(err);
-            reject(false);
-          });
-      });
+      try {
+        let response = await policy();
+        _self.dataObj.policy = response.data.policy;
+        _self.dataObj.signature = response.data.signature;
+        _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
+        _self.dataObj.key = response.data.key;
+        _self.dataObj.dir = response.data.key.slice(0, 21);
+        _self.dataObj.host = response.data.host;
+        this.imgList.push({
+          uid: file.uid,
+          key: response.data.key
+        });
+        this.nums--;
+        return true;
+      } catch  (err) {
+        this.nums--;
+        return false;
+      }
+      // return new Promise((resolve, reject) => {
+      //   console.log('----ttt', file.uid);
+      //   policy()
+      //     .then(response => {
+      //       console.log('-----ccc', file.uid);
+      //       _self.dataObj.policy = response.data.policy;
+      //       _self.dataObj.signature = response.data.signature;
+      //       _self.dataObj.ossaccessKeyId = response.data.accessKeyId;
+      //       _self.dataObj.key = response.data.key;
+      //       _self.dataObj.dir = response.data.key.slice(0, 21);
+      //       _self.dataObj.host = response.data.host;
+      //       console.log('----dddd', response.data.key);
+      //       this.imgList.push({
+      //         uid: file.uid,
+      //         key: response.data.key
+      //       });
+      //       resolve(true);
+      //     })
+      //     .catch(err => {
+      //       console.log('----err',err);
+      //       reject(false);
+      //     });
+      // });
     },
     handleUploadSuccess(res, file, fileList) {
+      if(!this.isUpload) return;
+      this.isUpload = false;
+      setTimeout(() => {
+        if (this.nums > 0) {
+          this.timer = setInterval(() => {
+            if(this.nums === 0) {
+              clearInterval(this.timer);
+              this.uploadSuccess(res, file, fileList);
+            }
+          }, 1000);
+        } else {
+          this.uploadSuccess(res, file, fileList)
+        }
+      }, 1000);
+
+      // let url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
+      // if (!this.useOss) {
+      //   //不使用oss直接获取图片路径
+      //   url = res.data.url;
+      // }
+      // this.fileList.push({ name: file.name, url: url });
+      // this.emitInput(this.fileList);
+    },
+    uploadSuccess(res, file, fileList) {
       let files = [];
       fileList.forEach(file => {
         let url = file.url;
@@ -134,14 +184,6 @@ export default {
       });
       this.fileList.push(...files);
       this.emitInput(this.fileList);
-
-      // let url = this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name;
-      // if (!this.useOss) {
-      //   //不使用oss直接获取图片路径
-      //   url = res.data.url;
-      // }
-      // this.fileList.push({ name: file.name, url: url });
-      // this.emitInput(this.fileList);
     },
     handleExceed(files, fileList) {
       this.$message({
