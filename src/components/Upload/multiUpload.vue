@@ -48,7 +48,7 @@ export default {
       dialogVisible: false,
       dialogImageUrl: null,
       useOss: true, //使用oss->true;使用MinIO->false
-      ossUploadUrl: "/apiUpload",
+      ossUploadUrl: "http://mty-youquan.oss-cn-shenzhen.aliyuncs.com",
       minioUploadUrl: "http://localhost:8080/minio/upload",
       imgId: 0,
       imgList: []
