@@ -41,9 +41,9 @@
         <el-table-column label="统计日期" align="center">
           <template slot-scope="scope">{{scope.row.statDate}}</template>
         </el-table-column>
-        <el-table-column label="APP版本号" align="center">
-          <template slot-scope="scope">{{scope.row.systemVersion}}</template>
-        </el-table-column>
+<!--        <el-table-column label="APP版本号" align="center">-->
+<!--          <template slot-scope="scope">{{scope.row.systemVersion}}</template>-->
+<!--        </el-table-column>-->
         <el-table-column label="活跃用户UV" align="center">
           <template slot-scope="scope">{{scope.row.openAppUv}}</template>
         </el-table-column>
