@@ -10,7 +10,15 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      "/apiUpload": {
+        target: 'http://mty-youquan.oss-cn-shenzhen.aliyuncs.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/apiUpload': ''
+        }
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

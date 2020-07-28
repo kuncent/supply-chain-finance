@@ -104,8 +104,8 @@
                       :disabled="orderReturnApply.status!==0"
                       style="width:200px;margin-left: 10px"></el-input>
           </el-col>
-        </el-row>
-        <div v-show="orderReturnApply.status!==3">
+        </el-row> -->
+        <!-- <div v-show="orderReturnApply.status!==3">
         <el-row>
           <el-col class="form-border form-left-bg font-small" :span="6" style="height:52px;line-height:32px">选择收货点
           </el-col>
