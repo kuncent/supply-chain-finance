@@ -254,7 +254,7 @@ export const asyncRouterMap = [
         component: () => import('@/views/sms/coupon/update'),
         meta: { title: '修改优惠券' },
         hidden: true
-      },{
+      }, {
         path: 'updateLottery',
         name: 'updateLottery',
         component: () => import('@/views/sms/lottery/update'),
@@ -285,6 +285,19 @@ export const asyncRouterMap = [
         name: 'homeHot',
         component: () => import('@/views/sms/hot/index'),
         meta: { title: '人气推荐', icon: 'sms-hot' }
+      },
+      {
+        path: 'select',
+        name: 'homeSelect',
+        component: () => import('@/views/sms/select/index'),
+        meta: { title: '商品优选', icon: 'sms-hot' }
+      },
+      {
+        path: 'selectAdd',
+        name: 'homeSelectAdd',
+        component: () => import('@/views/sms/select/add'),
+        meta: { title: '商品优选' },
+        hidden: true
       },
       {
         path: 'subject',
@@ -333,14 +346,20 @@ export const asyncRouterMap = [
     path: '/statistics',
     component: Layout,
     redirect: '/statistics/daily',
-    name: 'cms',
+    name: 'statistics',
     meta: { title: '日报统计', icon: 'oms' },
     children: [
       {
         path: 'daily',
         name: 'daily',
         component: () => import('@/views/statistics/daily/daily'),
-        meta: { title: '用户列表', icon: 'ums-role' }
+        meta: { title: '日报统计', icon: 'ums-role' }
+      },
+      {
+        path: 'orderState',
+        name: 'orderState',
+        component: () => import('@/views/statistics/orderState/index'),
+        meta: { title: '订单统计', icon: 'ums-role' }
       },
     ]
   },

@@ -141,7 +141,7 @@
       <el-form-item label="视频主图：">
         <single-multi-upload v-model="vedioPics"></single-multi-upload>
       </el-form-item>
-      <el-form-item label="视频主图：">
+      <el-form-item label="视频上传：">
         <el-upload
           action="http://mty-youquan.oss-cn-shenzhen.aliyuncs.com"
           :data="dataObj"
@@ -360,10 +360,9 @@ export default {
     },
     handleSuccess(response, file) {
       const url = this.dataObj.host + "/" + this.dataObj.key;
-      this.row.videoUrl = url;
+      this.value.videoUrl = url;
     },
     beforeUpload(file) {
-      console.log(333333)
       const _self = this;
       const fileName = file.uid;
       this.listObj[fileName] = {};
