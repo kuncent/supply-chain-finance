@@ -41,14 +41,20 @@
         <el-table-column label="统计日期" align="center">
           <template slot-scope="scope">{{scope.row.statDate}}</template>
         </el-table-column>
-        <el-table-column label="APP版本号" align="center">
-          <template slot-scope="scope">{{scope.row.systemVersion}}</template>
-        </el-table-column>
+<!--        <el-table-column label="APP版本号" align="center">-->
+<!--          <template slot-scope="scope">{{scope.row.systemVersion}}</template>-->
+<!--        </el-table-column>-->
         <el-table-column label="活跃用户UV" align="center">
           <template slot-scope="scope">{{scope.row.openAppUv}}</template>
         </el-table-column>
-        <el-table-column label="打开抽奖页面UV" align="center">
+        <el-table-column label="点击活动UV" align="center">
           <template slot-scope="scope">{{scope.row.openActivityUv}}</template>
+        </el-table-column>
+        <el-table-column label="点击抽奖UV" align="center">
+          <template slot-scope="scope">{{scope.row.openLuckdrawUv}}</template>
+        </el-table-column>
+        <el-table-column label="点击红包UV" align="center">
+          <template slot-scope="scope">{{scope.row.openRedbagUv}}</template>
         </el-table-column>
         <el-table-column label="优惠券弹窗点击UV" align="center">
           <template slot-scope="scope">{{scope.row.openPopcouponUv}}</template>
@@ -68,15 +74,15 @@
         <el-table-column label="更新时间" align="center">
           <template slot-scope="scope">{{scope.row.updateTime | formatCreateTime}}</template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="sendGiftConfim(scope.row)"
-              v-show="scope.row.status===1 || scope.row.status===2||scope.row.status===3"
-            >发放礼品卡</el-button>
-          </template>
-        </el-table-column>
+<!--        <el-table-column label="操作" width="200" align="center">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-button-->
+<!--              size="mini"-->
+<!--              @click="sendGiftConfim(scope.row)"-->
+<!--              v-show="scope.row.status===1 || scope.row.status===2||scope.row.status===3"-->
+<!--            >发放礼品卡</el-button>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
       </el-table>
     </div>
     <div class="pagination-container">
