@@ -55,7 +55,7 @@
           </el-col>
           <el-col class="form-border font-small" :span="18" style="height:50px">
             {{orderReturnApply.orderSn}}
-            <el-button type="text" size="small" @click="handleViewOrder">查看</el-button>
+            <!-- <el-button type="text" size="small" @click="handleViewOrder">查看</el-button> -->
           </el-col>
         </el-row>
         <el-row>
@@ -66,7 +66,7 @@
           <el-col class="form-border form-left-bg font-small" :span="6">用户账号</el-col>
           <el-col class="form-border font-small" :span="18">{{orderReturnApply.memberUsername}}</el-col>
         </el-row>
-        <el-row>
+        <!-- <el-row>
           <el-col class="form-border form-left-bg font-small" :span="6">联系人</el-col>
           <el-col class="form-border font-small" :span="18">{{orderReturnApply.returnName}}</el-col>
         </el-row>
@@ -88,14 +88,14 @@
           <el-col class="form-border font-small" :span="18" style="height:100px">
             <img v-for="item in proofPics" style="width:80px;height:80px" :src="item">
           </el-col>
-        </el-row>
+        </el-row> -->
       </div>
       <div class="form-container-border">
         <el-row>
           <el-col class="form-border form-left-bg font-small" :span="6">订单金额</el-col>
           <el-col class="form-border font-small" :span="18">￥{{totalAmount}}</el-col>
         </el-row>
-        <el-row>
+        <!-- <el-row>
           <el-col class="form-border form-left-bg font-small" :span="6" style="height:52px;line-height:32px">确认退款金额
           </el-col>
           <el-col class="form-border font-small" style="height:52px" :span="18">
@@ -104,8 +104,8 @@
                       :disabled="orderReturnApply.status!==0"
                       style="width:200px;margin-left: 10px"></el-input>
           </el-col>
-        </el-row>
-        <div v-show="orderReturnApply.status!==3">
+        </el-row> -->
+        <!-- <div v-show="orderReturnApply.status!==3">
         <el-row>
           <el-col class="form-border form-left-bg font-small" :span="6" style="height:52px;line-height:32px">选择收货点
           </el-col>
@@ -138,7 +138,7 @@
           <el-col class="form-border form-left-bg font-small" :span="6">联系电话</el-col>
           <el-col class="form-border font-small" :span="18">{{currentAddress.phone}}</el-col>
         </el-row>
-        </div>
+        </div> -->
       </div>
       <div class="form-container-border" v-show="orderReturnApply.status!==0">
         <el-row>
