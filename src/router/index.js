@@ -126,6 +126,13 @@ export const asyncRouterMap = [
       component: () => import('@/views/pms/brand/update'),
       meta: { title: '编辑品牌' },
       hidden: true
+    },
+    {
+      path: 'productShop',
+      name: 'productShop',
+      component: () => import('@/views/pms/productShop/index'),
+      meta: { title: '店铺管理' },
+      hidden: true
     }
     ]
   },
