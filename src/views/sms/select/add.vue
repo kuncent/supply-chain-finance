@@ -14,7 +14,7 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="商品名称：">
-            <el-input v-model="listQuery.productName" class="input-width" placeholder="商品名称"></el-input>
+            <el-input v-model="listQuery.nameSearch" class="input-width" placeholder="商品名称"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -194,7 +194,7 @@ export default {
         listQuery: {
           keyword: null,
           pageNum: 1,
-          pageSize: 5
+          pageSize: 10
         }
       },
       sortDialogVisible: false,

@@ -15,6 +15,7 @@
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
+              :default-time="['00:00:00']"
             ></el-date-picker>
           </el-form-item>
         </el-form>
@@ -33,33 +34,51 @@
         v-loading="listLoading"
         border
       >
-        <el-table-column label="总子订单数" align="center">
-          <template slot-scope="scope">{{scope.row.subOrderCount}}</template>
+        <el-table-column label="活跃用户UV" align="center">
+          <template slot-scope="scope">{{scope.row.openAppUv}}</template>
         </el-table-column>
-        <el-table-column label="总父订单数" align="center">
-          <template slot-scope="scope">{{scope.row.orderCount}}</template>
+        <el-table-column label="点击活动UV" align="center">
+          <template slot-scope="scope">{{scope.row.openActivityUv}}</template>
         </el-table-column>
-        <el-table-column label="退款子订单数" align="center">
-          <template slot-scope="scope">{{scope.row.refundCount}}</template>
+        <el-table-column label="点击抽奖UV" align="center">
+          <template slot-scope="scope">{{scope.row.openLuckdrawUv}}</template>
         </el-table-column>
-        <el-table-column label="待付款子订单数" align="center">
-          <template slot-scope="scope">{{scope.row.unpayCount}}</template>
+        <el-table-column label="点击红包UV" align="center">
+          <template slot-scope="scope">{{scope.row.openRedbagUv}}</template>
         </el-table-column>
-        <el-table-column label="GMV" align="center">
-          <template slot-scope="scope">{{scope.row.gvm}}</template>
+        <el-table-column label="优惠券弹窗点击UV" align="center">
+          <template slot-scope="scope">{{scope.row.openPopcouponUv}}</template>
         </el-table-column>
-        <el-table-column label="销售额" align="center">
-          <template slot-scope="scope">{{scope.row.sales}}</template>
+        <el-table-column label="点击商品UV" align="center">
+          <template slot-scope="scope">{{scope.row.clickGoodsUv}}</template>
         </el-table-column>
-        <el-table-column label="实付金额" align="center">
-          <template slot-scope="scope">{{scope.row.cost}}</template>
+        <el-table-column label="点击购买UV" align="center">
+          <template slot-scope="scope">{{scope.row.clickBuyUv}}</template>
+        </el-table-column>
+        <el-table-column label="加购UV" align="center">
+          <template slot-scope="scope">{{scope.row.addCartUv}}</template>
+        </el-table-column>
+        <el-table-column label="创建订单数" align="center">
+          <template slot-scope="scope">{{scope.row.createOrders}}</template>
         </el-table-column>
       </el-table>
+    </div>
+    <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        layout="total, sizes,prev, pager, next,jumper"
+        :current-page.sync="listQuery.pageNum"
+        :page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15]"
+        :total="total"
+      ></el-pagination>
     </div>
   </div>
 </template>
 <script>
-import { fetchOrderStatList } from "@/api/statics";
+import { fetchReportList } from "@/api/statics";
 import { formatDate } from "@/utils/date";
 import LogisticsDialog from "@/views/oms/order/components/logisticsDialog";
 const defaultListQuery = {
@@ -75,7 +94,7 @@ export default {
     return {
       listQuery: Object.assign({}, defaultListQuery),
       listLoading: true,
-      list: [],
+      list: null,
       total: null,
       createTime: null,
       isSendGift: false,
@@ -122,6 +141,9 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
+    handleViewOrder(index, row) {
+      this.$router.push({ path: "/oms/orderDetail", query: { id: row.id } });
+    },
     handleCloseOrder(index, row) {
       this.closeOrder.dialogVisible = true;
       this.closeOrder.orderIds = [row.id];
@@ -158,12 +180,38 @@ export default {
       this.listQuery.pageNum = val;
       this.getList();
     },
+    handleCloseOrderConfirm() {
+      if (this.closeOrder.content == null || this.closeOrder.content === "") {
+        this.$message({
+          message: "操作备注不能为空",
+          type: "warning",
+          duration: 1000
+        });
+        return;
+      }
+      let params = new URLSearchParams();
+      params.append("ids", this.closeOrder.orderIds);
+      params.append("note", this.closeOrder.content);
+      closeOrder(params).then(response => {
+        this.closeOrder.orderIds = [];
+        this.closeOrder.dialogVisible = false;
+        this.getList();
+        this.$message({
+          message: "修改成功",
+          type: "success",
+          duration: 1000
+        });
+      });
+    },
     getList() {
       this.listLoading = true;
-      this.list = [];
-      fetchOrderStatList(this.listQuery).then(response => {
+      fetchReportList(this.listQuery).then(response => {
         this.listLoading = false;
-        this.list.push(response.data);
+        this.list = response.data;
+        this.list.forEach(element => {
+          element.statDate = formatDate(new Date(element.statDate),"yyyy-MM-dd");
+        });
+        this.total = response.data.total;
       });
     }
   }

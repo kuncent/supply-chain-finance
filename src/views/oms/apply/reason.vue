@@ -109,7 +109,7 @@
   import {fetchList,deleteReason,updateStatus,addReason,getReasonDetail,updateReason} from '@/api/returnReason';
   const defaultListQuery = {
     pageNum: 1,
-    pageSize: 5
+    pageSize: 10
   };
   const defaultReturnReason = {
     name:null,

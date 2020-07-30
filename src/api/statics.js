@@ -10,6 +10,15 @@ export function fetchList(params) {
   })
 }
 
+// 报表统计
+export function fetchReportList(params) {
+  return request({
+    url: '/stat/couponUserStatSearch',
+    method: 'get',
+    params: params
+  })
+}
+
 // 订单统计
 export function fetchOrderStatList(params) {
   return request({

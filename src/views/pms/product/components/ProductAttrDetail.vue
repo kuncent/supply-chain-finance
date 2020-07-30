@@ -155,6 +155,10 @@
           <el-button size="small" type="primary">导入视频</el-button>
         </el-upload>
       </el-form-item>
+      <el-form-item label="视频详情：" v-if="value.videoUrl">
+        <video style="width:310px" :src="value.videoUrl" controls="controls">您的浏览器不支持 video 标签</video>
+        <el-button style="position: absolute;right: 290px;" type="danger" icon="el-icon-delete" circle @click="deleteVideo"></el-button>
+      </el-form-item>
       <el-form-item label="商品相册：">
         <multi-upload v-model="selectProductPics"></multi-upload>
       </el-form-item>
@@ -355,6 +359,9 @@ export default {
     }
   },
   methods: {
+    deleteVideo(){
+      this.value.videoUrl = '';
+    },
     handleChange(file, fileList) {
       this.fileList = fileList.slice(-3);
     },

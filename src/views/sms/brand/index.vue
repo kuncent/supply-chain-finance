@@ -222,7 +222,7 @@
           listQuery:{
             keyword: null,
             pageNum: 1,
-            pageSize: 5
+            pageSize: 10
           }
         },
         sortDialogVisible:false,

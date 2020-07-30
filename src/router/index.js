@@ -361,6 +361,12 @@ export const asyncRouterMap = [
         component: () => import('@/views/statistics/orderState/index'),
         meta: { title: '订单统计', icon: 'ums-role' }
       },
+      {
+        path: 'reportState',
+        name: 'reportState',
+        component: () => import('@/views/statistics/reportState/index'),
+        meta: { title: '日报统计', icon: 'ums-role' }
+      },
     ]
   },
   {
